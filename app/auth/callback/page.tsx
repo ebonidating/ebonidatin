@@ -1,92 +1,78 @@
-"use client"
+app/dashboard/page.tsx
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, CheckCircle, XCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
-export default function AuthCallbackPage() {
-  const router = useRouter()
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
-  const [message, setMessage] = useState("Verifying your email...")
+export default function DashboardPage() {
+  const [profile, setProfile] = useState<any>(null);
+  const supabase = createClientComponentClient();
+  const router = useRouter();
 
   useEffect(() => {
-    const verifyEmail = async () => {
-      try {
-        const supabase = createClient()
-
-        // Get the code from the URL
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const accessToken = hashParams.get("access_token")
-        const type = hashParams.get("type")
-
-        console.log("[v0] Callback params:", { type, hasToken: !!accessToken })
-
-        if (type === "signup" && accessToken) {
-          // Update the user's email_verified status in profiles
-          const {
-            data: { user },
-          } = await supabase.auth.getUser()
-
-          console.log("[v0] User from callback:", user?.id)
-
-          if (user) {
-            const { error } = await supabase.from("profiles").update({ email_verified: true }).eq("id", user.id)
-
-            if (error) {
-              console.error("[v0] Error updating email verification:", error)
-              throw new Error("Failed to verify email. Please try again.")
-            }
-
-            setStatus("success")
-            setMessage("Email verified successfully! Redirecting to dashboard...")
-
-            // Redirect to dashboard after 2 seconds
-            setTimeout(() => {
-              router.push("/dashboard")
-            }, 2000)
-          } else {
-            throw new Error("User not found")
-          }
-        } else {
-          setStatus("error")
-          setMessage("Invalid or expired verification link")
-        }
-      } catch (error: any) {
-        console.error("[v0] Verification error:", error)
-        setStatus("error")
-        setMessage(error.message || "An error occurred during verification")
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.replace("/auth/login");
+        return;
       }
-    }
 
-    verifyEmail()
-  }, [router])
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (!error && data) setProfile(data);
+    };
+
+    loadProfile();
+  }, [supabase, router]);
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-amber-600">
+        Loading your dashboard...
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 bg-gradient-to-b from-amber-50 to-white">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-white p-6">
+      <Card className="w-full max-w-lg shadow-md border border-amber-100">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            {status === "loading" && <Loader2 className="h-5 w-5 animate-spin text-amber-600" />}
-            {status === "success" && <CheckCircle className="h-5 w-5 text-green-600" />}
-            {status === "error" && <XCircle className="h-5 w-5 text-red-600" />}
-            Email Verification
-          </CardTitle>
-          <CardDescription>{message}</CardDescription>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-16 w-16 border border-amber-200">
+              <AvatarImage src={profile.avatar_url || ""} />
+              <AvatarFallback>{profile.name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-amber-800">{profile.name}</CardTitle>
+              <CardDescription>{profile.email}</CardDescription>
+              {profile.email_verified ? (
+                <p className="text-green-600 text-sm mt-1">✔ Email verified</p>
+              ) : (
+                <p className="text-red-600 text-sm mt-1">✖ Email not verified</p>
+              )}
+            </div>
+          </div>
         </CardHeader>
-        {status === "error" && (
-          <CardContent className="space-y-2">
-            <Button onClick={() => router.push("/auth/sign-up")} className="w-full bg-amber-600 hover:bg-amber-700">
-              Sign Up Again
-            </Button>
-            <Button onClick={() => router.push("/auth/login")} variant="outline" className="w-full">
-              Go to Login
-            </Button>
-          </CardContent>
-        )}
+        <CardContent className="mt-4 space-y-4">
+          <Button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              router.replace("/auth/login");
+            }}
+            className="w-full bg-amber-600 hover:bg-amber-700"
+          >
+            Logout
+          </Button>
+        </CardContent>
       </Card>
     </div>
-  )
+  );
 }
