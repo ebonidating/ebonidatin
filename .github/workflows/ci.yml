@@ -1,0 +1,140 @@
+name: CI — Next.js (pnpm) with auto-fix & Vercel preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (auto-fix)
+        id: lint
+        run: |
+          pnpm dlx next lint --fix || true
+          if pnpm dlx --versions prettier >/dev/null 2>&1; then
+            pnpm dlx prettier --write .
+          fi
+
+      - name: TypeScript check
+        run: pnpm dlx tsc -p tsconfig.json --noEmit
+
+      - name: Run tests (if present)
+        run: pnpm test
+
+      - name: Commit lint/format fixes and push back to PR branch
+        if: ${{ github.actor != 'github-actions[bot]' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No lint/format changes to commit"
+          else
+            git commit -m "chore: auto-fix lint/format issues [ci skip]" || true
+            git push origin HEAD:${{ github.head_ref }}
+          fi
+
+      - name: Build
+        run: pnpm dlx next build
+
+      - name: Wait a short time for Vercel to start
+        run: sleep 6
+
+      # ---------- Polling step (new) ----------
+      - name: Poll Vercel for preview deployment
+        id: poll-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          # PR head SHA (we trigger on pull_request so this should be available)
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          MAX_ATTEMPTS: 30    # adjust max attempts
+          SLEEP_SECONDS: 10   # adjust polling interval
+        run: |
+          set -euo pipefail
+          echo "Installing jq..."
+          sudo apt-get update -y && sudo apt-get install -y jq
+
+          echo "Looking up deployment for commit: $COMMIT_SHA"
+          attempt=0
+          while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
+            attempt=$((attempt + 1))
+            echo "Attempt $attempt / $MAX_ATTEMPTS"
+
+            resp=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v13/deployments?projectId=$VERCEL_PROJECT_ID&githubCommitSha=$COMMIT_SHA")
+
+            # parse first deployment (Vercel returns deployments array ordered newest-first)
+            deployment_uid=$(echo "$resp" | jq -r '.deployments[0].uid // empty')
+            state=$(echo "$resp" | jq -r '.deployments[0].state // empty')
+            url=$(echo "$resp" | jq -r '.deployments[0].url // empty')
+
+            if [ -n "$deployment_uid" ]; then
+              echo "Found deployment: $deployment_uid (state=$state)"
+              if [ "$state" = "READY" ]; then
+                echo "Deployment ready: $url"
+                echo "deployment_url=https://$url" >> $GITHUB_OUTPUT
+                exit 0
+              fi
+              if [ "$state" = "ERROR" ]; then
+                echo "Deployment error for $deployment_uid"
+                echo "deployment_error=$(echo "$resp" | jq -r '.deployments[0] | @json')" >> $GITHUB_OUTPUT
+                exit 1
+              fi
+            else
+              echo "No deployment found yet for commit $COMMIT_SHA"
+            fi
+
+            echo "Sleeping ${SLEEP_SECONDS}s before next poll..."
+            sleep "$SLEEP_SECONDS"
+          done
+
+          echo "Timed out waiting for Vercel preview after $MAX_ATTEMPTS attempts" >&2
+          exit 1
+
+      - name: Comment preview URL on PR
+        if: ${{ steps.poll-vercel.outcome == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const url = '${{ steps.poll-vercel.outputs.deployment_url }}' || '';
+            if (!url) throw new Error('No deployment URL available from polling step');
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `Vercel preview deployment for this PR: ${url}`
+            });
