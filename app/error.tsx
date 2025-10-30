@@ -1,14 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Heart, RefreshCw } from "lucide-react"
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => {
-    console.error("[v0] Error occurred:", error)
-  }, [error])
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white flex items-center justify-center p-4">
       <div className="text-center max-w-md">

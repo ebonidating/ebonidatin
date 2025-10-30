@@ -29,13 +29,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error sending message:", error)
       return NextResponse.json({ error: "Failed to send message" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, message: data })
   } catch (error) {
-    console.error("[v0] Send message error:", error)
     return NextResponse.json({ error: "Failed to send message" }, { status: 500 })
   }
 }

@@ -54,7 +54,6 @@ export function PrivacySettings({ userId, currentSettings }: PrivacySettingsProp
         description: "Your privacy settings have been updated",
       })
     } catch (error) {
-      console.error("[v0] Privacy settings error:", error)
       toast({
         title: "Error",
         description: "Failed to save settings",
@@ -93,7 +92,6 @@ export function PrivacySettings({ userId, currentSettings }: PrivacySettingsProp
         description: "Thank you for helping keep our community safe",
       })
     } catch (error) {
-      console.error("[v0] Report error:", error)
       toast({
         title: "Error",
         description: "Failed to submit report",
@@ -117,7 +115,6 @@ export function PrivacySettings({ userId, currentSettings }: PrivacySettingsProp
         description: "You won't see this user anymore",
       })
     } catch (error) {
-      console.error("[v0] Block error:", error)
       toast({
         title: "Error",
         description: "Failed to block user",

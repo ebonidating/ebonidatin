@@ -67,7 +67,7 @@ export function UserList() {
       setUsers(data || [])
       setFilteredUsers(data || [])
     } catch (err) {
-      console.error("[v0] Error fetching users:", err)
+      // Error is handled gracefully by showing empty state
     } finally {
       setLoading(false)
     }

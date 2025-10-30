@@ -74,8 +74,6 @@ export async function detectUserLanguage(): Promise<Language> {
     // Try to get country from Vercel's geo headers
     const country = headersList.get("x-vercel-ip-country")
 
-    console.log("[v0] Detected country:", country)
-
     if (country && countryLanguageMap[country]) {
       return countryLanguageMap[country]
     }
@@ -93,7 +91,6 @@ export async function detectUserLanguage(): Promise<Language> {
     // Default to English
     return "en"
   } catch (error) {
-    console.error("[v0] Error detecting language:", error)
     return "en"
   }
 }

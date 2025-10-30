@@ -1,13 +1,9 @@
-# Eboni Dating
+# Building
 
-A modern dating web app built with **Next.js**, **Supabase**, and **Tailwind CSS** — designed to create a better and more personalized matching experience.
+To build the project, run the following command:
 
----
+\`\`\`bash
+npm run build
+\`\`\`
 
-## 🚀 Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/ebonidating/ebonidatin.git
-cd ebonidatin
+This will create a production build of the application in the `.next` directory.

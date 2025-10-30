@@ -40,7 +40,6 @@ export function VideoCallInterface({ otherUserName, onEndCall }: VideoCallInterf
         localVideoRef.current.srcObject = stream
       }
     } catch (err) {
-      console.error("[v0] Error accessing media devices:", err)
       setError("Failed to access camera/microphone. Please check permissions.")
     }
   }

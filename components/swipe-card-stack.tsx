@@ -6,7 +6,7 @@ import { useState, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Heart, X, Star, MapPin, Briefcase, GraduationCap, Info } from "lucide-react"
+import { Heart, X, Star, MapPin, Briefcase, GraduationCap, Info, ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
 
@@ -32,6 +32,7 @@ interface SwipeCardStackProps {
 export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps) {
   const [profiles, setProfiles] = useState<Profile[]>(initialProfiles)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [photoIndex, setPhotoIndex] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [showDetails, setShowDetails] = useState(false)
@@ -39,6 +40,17 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
   const { toast } = useToast()
 
   const currentProfile = profiles[currentIndex]
+  const modelImages = ["/model-1.jpg", "/model-2.jpg", "/model-3.jpg", "/model-4.jpg", "/model-5.jpg"]
+
+  const getProfileImages = (profile: Profile, index: number) => {
+    if (profile.photos && profile.photos.length > 0) {
+      return profile.photos
+    }
+    return [modelImages[index % modelImages.length]]
+  }
+
+  const currentImages = currentProfile ? getProfileImages(currentProfile, currentIndex) : []
+  const currentPhoto = currentImages[photoIndex] || "/model-1.jpg"
 
   const handleSwipe = async (direction: "like" | "pass") => {
     if (!currentProfile) return
@@ -46,7 +58,6 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
     try {
       const supabase = createClient()
 
-      // Record the swipe
       await supabase.from("swipes").insert({
         user_id: userId,
         target_user_id: currentProfile.id,
@@ -54,7 +65,6 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
         created_at: new Date().toISOString(),
       })
 
-      // Check for mutual match
       if (direction === "like") {
         const { data: mutualSwipe } = await supabase
           .from("swipes")
@@ -65,7 +75,6 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
           .single()
 
         if (mutualSwipe) {
-          // Create match
           await supabase.from("matches").insert({
             user1_id: userId,
             user2_id: currentProfile.id,
@@ -79,11 +88,10 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
         }
       }
 
-      // Move to next profile
       setCurrentIndex((prev) => prev + 1)
+      setPhotoIndex(0)
       setDragOffset({ x: 0, y: 0 })
     } catch (error) {
-      console.error("[v0] Swipe error:", error)
       toast({
         title: "Error",
         description: "Failed to record swipe",
@@ -104,7 +112,6 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
   const handleMouseUp = () => {
     setIsDragging(false)
 
-    // Auto-swipe if dragged far enough
     if (Math.abs(dragOffset.x) > 100) {
       handleSwipe(dragOffset.x > 0 ? "like" : "pass")
     } else {
@@ -138,6 +145,16 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
     }
   }
 
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPhotoIndex((prev) => (prev === 0 ? currentImages.length - 1 : prev - 1))
+  }
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPhotoIndex((prev) => (prev === currentImages.length - 1 ? 0 : prev + 1))
+  }
+
   if (!currentProfile) {
     return (
       <Card className="w-full max-w-md mx-auto">
@@ -162,7 +179,7 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
             <CardContent className="p-0 h-full">
               <div className="relative h-full rounded-lg overflow-hidden">
                 <img
-                  src={profiles[currentIndex + 1].photos?.[0] || "/placeholder.svg?height=600&width=400"}
+                  src={getProfileImages(profiles[currentIndex + 1], currentIndex + 1)[0] || "/placeholder.svg"}
                   alt={profiles[currentIndex + 1].full_name}
                   className="w-full h-full object-cover"
                 />
@@ -171,7 +188,7 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
           </Card>
         )}
 
-        {/* Current card */}
+        {/* Current card with photo slider */}
         <Card
           ref={cardRef}
           className="absolute inset-0 cursor-grab active:cursor-grabbing transition-transform"
@@ -189,12 +206,43 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
         >
           <CardContent className="p-0 h-full">
             <div className="relative h-full rounded-lg overflow-hidden">
-              {/* Photo */}
+              {/* Photo with slide view */}
               <img
-                src={currentProfile.photos?.[0] || "/placeholder.svg?height=600&width=400"}
+                src={currentPhoto || "/placeholder.svg"}
                 alt={currentProfile.full_name}
                 className="w-full h-full object-cover"
               />
+
+              {currentImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevPhoto}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-colors"
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={handleNextPhoto}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-colors"
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+
+                  {/* Photo indicators */}
+                  <div className="absolute top-2 left-0 right-0 flex gap-1 px-2">
+                    {currentImages.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          idx === photoIndex ? "bg-white" : "bg-white/40"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               {/* Swipe indicators */}
               {dragOffset.x > 50 && (

@@ -160,7 +160,7 @@ export default function MessagesContent({ currentUserId, conversations, selected
         setNewMessage("")
       }
     } catch (error) {
-      console.error("[v0] Error sending message:", error)
+      // Error handled silently with UI feedback
     } finally {
       setIsSending(false)
     }

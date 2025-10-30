@@ -72,7 +72,6 @@ export function PushNotifications({ userId }: PushNotificationsProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] Push notification error:", error)
       toast({
         title: "Error",
         description: "Failed to enable notifications",

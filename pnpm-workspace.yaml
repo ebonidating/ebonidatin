@@ -1,3 +1,2 @@
-ignoredBuiltDependencies:
-#  - '@tailwindcss/oxide'
-  - '@vercel/speed-insights'
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'

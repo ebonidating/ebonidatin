@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -21,6 +21,26 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
   const [step, setStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const step1Ref = useRef<HTMLDivElement>(null)
+  const step2Ref = useRef<HTMLDivElement>(null)
+  const step3Ref = useRef<HTMLDivElement>(null)
+  const errorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (step === 1 && step1Ref.current) {
+      step1Ref.current.focus()
+    } else if (step === 2 && step2Ref.current) {
+      step2Ref.current.focus()
+    } else if (step === 3 && step3Ref.current) {
+      step3Ref.current.focus()
+    }
+  }, [step])
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.focus()
+    }
+  }, [error])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -90,19 +110,22 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
           <span className="text-3xl font-bold text-gray-900">Eboni Dating</span>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
-        <p className="text-muted-foreground">Step {step} of 3 - Let&apos;s get to know you better</p>
+        <p className="text-muted-foreground" aria-live="polite">Step {step} of 3 - Let&apos;s get to know you better</p>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full bg-cyan-600 transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} />
-        </div>
+        <progress
+          className="w-full h-2 [&::-webkit-progress-bar]:rounded-lg [&::-webkit-progress-value]:rounded-lg   [&::-webkit-progress-bar]:bg-slate-300 [&::-webkit-progress-value]:bg-cyan-600 [&::-moz-progress-bar]:bg-cyan-600"
+          value={step}
+          max="3"
+          aria-label={`Step ${step} of 3`}
+        />
       </div>
 
       {/* Step 1: Basic Info */}
       {step === 1 && (
-        <Card>
+        <Card ref={step1Ref} tabIndex={-1}>
           <CardHeader>
             <div className="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center mb-4">
               <User className="h-6 w-6 text-cyan-600" />
@@ -147,7 +170,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
             <div className="grid gap-2">
               <Label htmlFor="gender">Gender</Label>
               <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
-                <SelectTrigger>
+                <SelectTrigger id="gender">
                   <SelectValue placeholder="Select your gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -164,6 +187,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
               onClick={() => setStep(2)}
               className="w-full bg-cyan-600 hover:bg-cyan-700"
               disabled={!formData.full_name || !formData.display_name || !formData.date_of_birth || !formData.gender}
+              aria-disabled={!formData.full_name || !formData.display_name || !formData.date_of_birth || !formData.gender}
             >
               Continue
             </Button>
@@ -173,7 +197,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
 
       {/* Step 2: Location & Preferences */}
       {step === 2 && (
-        <Card>
+        <Card ref={step2Ref} tabIndex={-1}>
           <CardHeader>
             <div className="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center mb-4">
               <MapPin className="h-6 w-6 text-cyan-600" />
@@ -220,7 +244,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
                 value={formData.looking_for}
                 onValueChange={(value) => setFormData({ ...formData, looking_for: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger id="looking_for">
                   <SelectValue placeholder="Select what you're looking for" />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,6 +265,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
                 onClick={() => setStep(3)}
                 className="w-full bg-cyan-600 hover:bg-cyan-700"
                 disabled={!formData.city || !formData.country || !formData.looking_for}
+                aria-disabled={!formData.city || !formData.country || !formData.looking_for}
               >
                 Continue
               </Button>
@@ -251,7 +276,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
 
       {/* Step 3: About You */}
       {step === 3 && (
-        <Card>
+        <Card ref={step3Ref} tabIndex={-1}>
           <CardHeader>
             <div className="h-12 w-12 rounded-full bg-cyan-100 flex items-center justify-center mb-4">
               <Target className="h-6 w-6 text-cyan-600" />
@@ -269,8 +294,9 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
                 placeholder="Tell others about yourself, your interests, and what makes you unique..."
                 rows={5}
                 maxLength={500}
+                aria-describedby="bio-character-count"
               />
-              <p className="text-xs text-muted-foreground">{formData.bio.length}/500 characters</p>
+              <p id="bio-character-count" className="text-xs text-muted-foreground">{formData.bio.length}/500 characters</p>
             </div>
 
             <div className="grid gap-2">
@@ -292,7 +318,9 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
             </div>
 
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">{error}</div>
+              <div ref={errorRef} tabIndex={-1}>
+                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md" aria-live="polite">{error}</div>
+              </div>
             )}
 
             <div className="flex gap-2">
@@ -303,6 +331,7 @@ export default function OnboardingForm({ userId, userEmail }: OnboardingFormProp
                 onClick={handleSubmit}
                 className="w-full bg-cyan-600 hover:bg-cyan-700"
                 disabled={isLoading || !formData.bio}
+                aria-disabled={isLoading || !formData.bio}
               >
                 {isLoading ? "Creating Profile..." : "Complete Profile"}
               </Button>
