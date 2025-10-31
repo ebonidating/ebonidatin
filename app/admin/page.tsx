@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Heart, MessageCircle, Shield, Activity } from "lucide-react"
+import { Users, Heart, MessageCircle, Shield, Activity, AlertCircle } from "lucide-react"
 
 async function checkAdminAccess() {
   const supabase = await createClient()
@@ -15,10 +15,9 @@ async function checkAdminAccess() {
     redirect("/admin/login")
   }
 
-  // Check if user is an admin
   const { data: adminUser } = await supabase.from("admin_users").select("*").eq("user_id", user.id).single()
 
-  if (!adminUser) {
+  if (!adminUser || !["super_admin", "admin", "moderator"].includes(adminUser.role)) {
     redirect("/")
   }
 
@@ -30,14 +29,21 @@ export default async function AdminDashboard() {
 
   const supabase = await createClient()
 
-  // Fetch statistics
-  const [{ count: totalUsers }, { count: totalProfiles }, { count: totalMatches }, { count: totalMessages }] =
-    await Promise.all([
-      supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("profiles").select("*", { count: "exact", head: true }).not("bio", "is", null),
-      supabase.from("matches").select("*", { count: "exact", head: true }),
-      supabase.from("messages").select("*", { count: "exact", head: true }),
-    ])
+  const [
+    { count: totalUsers },
+    { count: totalProfiles },
+    { count: totalMatches },
+    { count: totalMessages },
+    { count: unverifiedUsers },
+    { count: reportedContent },
+  ] = await Promise.all([
+    supabase.from("profiles").select("*", { count: "exact", head: true }),
+    supabase.from("profiles").select("*", { count: "exact", head: true }).not("bio", "is", null),
+    supabase.from("matches").select("*", { count: "exact", head: true }),
+    supabase.from("messages").select("*", { count: "exact", head: true }),
+    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("email_verified", false),
+    supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "pending"),
+  ])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,7 +55,9 @@ export default async function AdminDashboard() {
             <span className="text-xl font-bold">Eboni Dating Admin</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{adminUser.role === "super_admin" ? "Super Admin" : "Admin"}</span>
+            <span className="text-sm text-gray-600 font-medium">
+              {adminUser.role === "super_admin" ? "Super Admin" : adminUser.role === "admin" ? "Admin" : "Moderator"}
+            </span>
             <Button variant="outline" asChild>
               <Link href="/">View Site</Link>
             </Button>
@@ -64,7 +72,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Statistics Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid md:grid-cols-6 gap-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">Total Users</CardTitle>
@@ -100,12 +108,34 @@ export default async function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Messages Sent</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Messages</CardTitle>
               <MessageCircle className="h-4 w-4 text-gray-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalMessages || 0}</div>
               <p className="text-xs text-gray-500 mt-1">Total conversations</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-orange-200 bg-orange-50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-orange-600">Unverified</CardTitle>
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">{unverifiedUsers || 0}</div>
+              <p className="text-xs text-orange-500 mt-1">Pending verification</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-red-600">Reports</CardTitle>
+              <AlertCircle className="h-4 w-4 text-red-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{reportedContent || 0}</div>
+              <p className="text-xs text-red-500 mt-1">Pending review</p>
             </CardContent>
           </Card>
         </div>

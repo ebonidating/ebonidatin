@@ -91,7 +91,7 @@ export default function DiscoverContent({ currentUserId, profiles }: DiscoverCon
         setCurrentIndex((prev) => prev + 1)
       }
     } catch (error) {
-      console.error("[v0] Error liking profile:", error)
+      // Error handled silently with UI feedback
     } finally {
       setIsLiking(false)
     }

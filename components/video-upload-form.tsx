@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +22,20 @@ export function VideoUploadForm({ onSuccess }: VideoUploadFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const errorRef = useRef<HTMLDivElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (error && errorRef.current) {
+      errorRef.current.focus()
+    }
+  }, [error])
+
+  useEffect(() => {
+    if (success && successRef.current) {
+      successRef.current.focus()
+    }
+  }, [success])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,7 +80,6 @@ export function VideoUploadForm({ onSuccess }: VideoUploadFormProps) {
         onSuccess?.()
       }, 2000)
     } catch (err) {
-      console.error("[v0] Upload error:", err)
       setError("Failed to upload video. Please try again.")
     } finally {
       setLoading(false)
@@ -80,18 +93,22 @@ export function VideoUploadForm({ onSuccess }: VideoUploadFormProps) {
         <CardDescription>Share your moments with the community</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" aria-busy={loading}>
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+            <div ref={errorRef} tabIndex={-1}>
+              <Alert variant="destructive" aria-live="polite">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </div>
           )}
 
           {success && (
-            <Alert className="bg-green-50 text-green-900 border-green-200">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>Video uploaded successfully!</AlertDescription>
-            </Alert>
+            <div ref={successRef} tabIndex={-1}>
+              <Alert className="bg-green-50 text-green-900 border-green-200" aria-live="polite">
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription>Video uploaded successfully!</AlertDescription>
+              </Alert>
+            </div>
           )}
 
           <div className="space-y-2">

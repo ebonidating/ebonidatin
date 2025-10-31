@@ -10,14 +10,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    // Upload to Vercel Blob
     const blob = await put(file.name, file, {
       access: "public",
     })
 
     return NextResponse.json({ url: blob.url })
   } catch (error) {
-    console.error("[v0] Upload error:", error)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }

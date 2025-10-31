@@ -1,8 +1,13 @@
-import { withWorkflow } from "workflow/next";
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  // your existing Next.js config options go here
-  // e.g., reactStrictMode: true, images: {...}, etc.
-};
+  experimental: {
+    forceSwcTransforms: false,
+  },
+  swcMinify: false,
+  output: 'standalone',
+  images: {
+    domains: ['ebonidating.com'],
+  },
+}
 
-export default withWorkflow(nextConfig);
+export default nextConfig

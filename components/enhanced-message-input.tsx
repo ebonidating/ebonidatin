@@ -68,7 +68,6 @@ export function EnhancedMessageInput({ matchId, senderId, receiverId, onMessageS
         description: "Your message has been delivered",
       })
     } catch (error) {
-      console.error("[v0] Send message error:", error)
       toast({
         title: "Error",
         description: "Failed to send message",
@@ -97,7 +96,6 @@ export function EnhancedMessageInput({ matchId, senderId, receiverId, onMessageS
       const { url } = await response.json()
       await handleSendMessage(url, "image")
     } catch (error) {
-      console.error("[v0] Image upload error:", error)
       toast({
         title: "Error",
         description: "Failed to upload image",
@@ -145,7 +143,6 @@ export function EnhancedMessageInput({ matchId, senderId, receiverId, onMessageS
         setRecordingTime((prev) => prev + 1)
       }, 1000)
     } catch (error) {
-      console.error("[v0] Recording error:", error)
       toast({
         title: "Error",
         description: "Failed to start recording",

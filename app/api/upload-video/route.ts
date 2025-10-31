@@ -22,12 +22,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No video file provided" }, { status: 400 })
     }
 
-    // Upload video to Vercel Blob
     const blob = await put(`videos/${user.id}/${Date.now()}-${file.name}`, file, {
       access: "public",
     })
 
-    // Create post in database
     const { data: post, error } = await supabase
       .from("posts")
       .insert({
@@ -40,13 +38,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      console.error("[v0] Error creating post:", error)
       return NextResponse.json({ error: "Failed to create post" }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, post })
   } catch (error) {
-    console.error("[v0] Upload error:", error)
     return NextResponse.json({ error: "Upload failed" }, { status: 500 })
   }
 }

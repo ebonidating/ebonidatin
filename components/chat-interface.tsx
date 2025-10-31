@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -46,7 +45,6 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
   useEffect(() => {
     fetchMessages()
 
-    // Subscribe to new messages
     const channel = supabase
       .channel("chat_messages")
       .on(
@@ -93,7 +91,6 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
 
       setMessages(data || [])
     } catch (err) {
-      console.error("[v0] Error fetching messages:", err)
       setError("Failed to load messages")
     } finally {
       setLoading(false)
@@ -124,7 +121,6 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
       setNewMessage("")
       scrollToBottom()
     } catch (err) {
-      console.error("[v0] Error sending message:", err)
       setError("Failed to send message")
     } finally {
       setSending(false)

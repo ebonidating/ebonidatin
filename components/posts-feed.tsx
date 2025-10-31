@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Heart, MessageCircle, Eye, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { VerifiedBadge } from "./verified-badge"
 
 interface Post {
   id: string
@@ -20,6 +21,7 @@ interface Post {
   profiles: {
     full_name: string | null
     display_name: string | null
+    verified: boolean
   }
 }
 
@@ -27,6 +29,7 @@ export function PostsFeed() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const likeButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   useEffect(() => {
     fetchPosts()
@@ -42,7 +45,8 @@ export function PostsFeed() {
           *,
           profiles (
             full_name,
-            display_name
+            display_name,
+            verified
           )
         `,
         )
@@ -53,7 +57,6 @@ export function PostsFeed() {
 
       setPosts(data || [])
     } catch (err) {
-      console.error("[v0] Error fetching posts:", err)
       setError("Failed to load posts")
     } finally {
       setLoading(false)
@@ -73,10 +76,12 @@ export function PostsFeed() {
 
       if (error) throw error
 
-      // Update local state
       setPosts(posts.map((p) => (p.id === postId ? { ...p, likes: p.likes + 1 } : p)))
+
+      // Re-focus the like button after the state update
+      likeButtonRefs.current[postId]?.focus()
     } catch (err) {
-      console.error("[v0] Error liking post:", err)
+      setError("Failed to like post")
     }
   }
 
@@ -92,17 +97,20 @@ export function PostsFeed() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div role="status" className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-cyan-600" />
+        <span className="sr-only">Loading...</span>
       </div>
     )
   }
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div role="alert">
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </div>
     )
   }
 
@@ -127,10 +135,13 @@ export function PostsFeed() {
                   {getInitials(post.profiles?.display_name || post.profiles?.full_name)}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <CardTitle className="text-base">
-                  {post.profiles?.display_name || post.profiles?.full_name || "Anonymous"}
-                </CardTitle>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <CardTitle as="h4" className="text-base">
+                    {post.profiles?.display_name || post.profiles?.full_name || "Anonymous"}
+                  </CardTitle>
+                  <VerifiedBadge verified={post.profiles?.verified || false} size="sm" />
+                </div>
                 <CardDescription>{new Date(post.created_at).toLocaleDateString()}</CardDescription>
               </div>
             </div>
@@ -142,18 +153,26 @@ export function PostsFeed() {
             </div>
 
             <div className="rounded-lg overflow-hidden bg-black">
-              <video controls className="w-full max-h-[500px]" preload="metadata">
+              <video controls className="w-full max-h-[500px]" preload="metadata" title={post.title}>
                 <source src={post.video_url} type="video/mp4" />
+                <track kind="captions" srcLang="en" label="English captions" />
                 Your browser does not support the video tag.
               </video>
             </div>
 
             <div className="flex items-center gap-4 pt-2">
-              <Button variant="ghost" size="sm" onClick={() => handleLike(post.id)} className="gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleLike(post.id)}
+                className="gap-2"
+                aria-label={`Like post by ${post.profiles?.display_name || "Anonymous"}`}
+                ref={(el) => (likeButtonRefs.current[post.id] = el)}
+              >
                 <Heart className="h-4 w-4" />
-                <span>{post.likes}</span>
+                <span aria-live="polite">{post.likes}</span>
               </Button>
-              <Button variant="ghost" size="sm" className="gap-2">
+              <Button variant="ghost" size="sm" className="gap-2" aria-label={`Comment on post by ${post.profiles?.display_name || "Anonymous"}`}>
                 <MessageCircle className="h-4 w-4" />
                 <span>Comment</span>
               </Button>

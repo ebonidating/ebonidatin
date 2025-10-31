@@ -87,7 +87,6 @@ export function EventsCalendar({ userId, events }: EventsCalendarProps) {
         })
       }
     } catch (error) {
-      console.error("[v0] RSVP error:", error)
       toast({
         title: "Error",
         description: "Failed to update RSVP",

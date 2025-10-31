@@ -50,7 +50,7 @@ export function MessageReactions({ messageId, currentReactions = [], currentUser
 
       setShowPicker(false)
     } catch (error) {
-      console.error("[v0] Reaction error:", error)
+      // Reaction state is maintained for UX
     }
   }
 

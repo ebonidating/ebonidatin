@@ -4,54 +4,112 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Check, Crown, Sparkles, Zap, Award } from "lucide-react"
+import { Check, Crown, Sparkles, Zap } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { SUBSCRIPTION_PRODUCTS } from "@/lib/products"
-import { startCheckoutSession } from "@/app/actions/stripe"
 
 interface SubscriptionPlansProps {
   userId: string
   currentPlan?: string
 }
 
-const planIcons = {
-  starter: Zap,
-  advanced: Sparkles,
-  premium: Crown,
-  silver: Award,
-  gold: Crown,
-}
-
-const planColors = {
-  starter: { text: "text-gray-600", bg: "bg-gray-100" },
-  advanced: { text: "text-cyan-600", bg: "bg-cyan-100" },
-  premium: { text: "text-purple-600", bg: "bg-purple-100" },
-  silver: { text: "text-gray-600", bg: "bg-gray-200" },
-  gold: { text: "text-yellow-600", bg: "bg-yellow-100" },
-}
+const plans = [
+  {
+    id: "starter",
+    name: "Starter",
+    price: 0,
+    interval: "forever",
+    icon: Zap,
+    color: "text-gray-600",
+    bgColor: "bg-gray-100",
+    features: [
+      "Basic profile",
+      "Limited swipes per day",
+      "See who liked you (limited)",
+      "Basic filters",
+      "Standard support",
+    ],
+  },
+  {
+    id: "advanced",
+    name: "Advanced",
+    price: 9.99,
+    interval: "month",
+    icon: Sparkles,
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-100",
+    features: [
+      "Everything in Starter",
+      "Unlimited swipes",
+      "See all who liked you",
+      "Advanced filters",
+      "Boost profile visibility",
+      "Priority support",
+    ],
+    popular: true,
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 19.99,
+    interval: "month",
+    icon: Crown,
+    color: "text-purple-600",
+    bgColor: "bg-purple-100",
+    features: [
+      "Everything in Advanced",
+      "Incognito mode",
+      "Rewind last swipe",
+      "Unlimited super likes",
+      "Profile customization",
+      "Read receipts",
+      "VIP support",
+    ],
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    price: 29.99,
+    interval: "month",
+    icon: Crown,
+    color: "text-yellow-600",
+    bgColor: "bg-yellow-100",
+    features: [
+      "Everything in Premium",
+      "Top profile placement",
+      "Exclusive badges",
+      "Video profiles",
+      "Advanced analytics",
+      "Monthly profile review",
+      "Dedicated account manager",
+    ],
+  },
+]
 
 export function SubscriptionPlans({ userId, currentPlan = "starter" }: SubscriptionPlansProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const { toast } = useToast()
 
   const handleSubscribe = async (planId: string) => {
-    if (planId === "starter") {
-      toast({
-        title: "Already on Starter",
-        description: "You're already on the free Starter plan",
-      })
-      return
-    }
-
     setLoading(planId)
 
     try {
-      const url = await startCheckoutSession(planId, userId)
-      if (url) {
-        window.location.href = url
-      }
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planId,
+          userId,
+        }),
+      })
+
+      if (!response.ok) throw new Error("Failed to create checkout session")
+
+      const { url } = await response.json()
+
+      window.location.href = url
     } catch (error) {
-      console.error("[v0] Subscription error:", error)
       toast({
         title: "Error",
         description: "Failed to start subscription process",
@@ -69,32 +127,30 @@ export function SubscriptionPlans({ userId, currentPlan = "starter" }: Subscript
         <p className="text-muted-foreground">Unlock premium features and find your perfect match faster</p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
-        {SUBSCRIPTION_PRODUCTS.map((plan) => {
-          const Icon = planIcons[plan.id as keyof typeof planIcons]
-          const colors = planColors[plan.id as keyof typeof planColors]
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {plans.map((plan) => {
+          const Icon = plan.icon
           const isCurrentPlan = currentPlan === plan.id
-          const isPopular = plan.id === "advanced"
 
           return (
-            <Card key={plan.id} className={`relative ${isPopular ? "border-2 border-amber-500 shadow-lg" : ""}`}>
-              {isPopular && (
+            <Card key={plan.id} className={`relative ${plan.popular ? "border-2 border-amber-500 shadow-lg" : ""}`}>
+              {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-amber-500">Most Popular</Badge>
                 </div>
               )}
 
               <CardHeader>
-                <div className={`h-12 w-12 rounded-full ${colors.bg} flex items-center justify-center mb-4`}>
-                  <Icon className={`h-6 w-6 ${colors.text}`} />
+                <div className={`h-12 w-12 rounded-full ${plan.bgColor} flex items-center justify-center mb-4`}>
+                  <Icon className={`h-6 w-6 ${plan.color}`} />
                 </div>
                 <CardTitle>{plan.name}</CardTitle>
                 <CardDescription>
-                  {plan.priceInCents === 0 ? (
+                  {plan.price === 0 ? (
                     <span className="text-2xl font-bold">Free</span>
                   ) : (
                     <>
-                      <span className="text-3xl font-bold">${(plan.priceInCents / 100).toFixed(2)}</span>
+                      <span className="text-3xl font-bold">${plan.price}</span>
                       <span className="text-muted-foreground">/{plan.interval}</span>
                     </>
                   )}
@@ -114,14 +170,14 @@ export function SubscriptionPlans({ userId, currentPlan = "starter" }: Subscript
                 <Button
                   onClick={() => handleSubscribe(plan.id)}
                   disabled={isCurrentPlan || loading === plan.id}
-                  className={`w-full ${isPopular ? "bg-amber-600 hover:bg-amber-700" : ""}`}
+                  className={`w-full ${plan.popular ? "bg-amber-600 hover:bg-amber-700" : ""}`}
                   variant={isCurrentPlan ? "outline" : "default"}
                 >
                   {loading === plan.id
                     ? "Processing..."
                     : isCurrentPlan
                       ? "Current Plan"
-                      : plan.priceInCents === 0
+                      : plan.price === 0
                         ? "Get Started"
                         : "Subscribe"}
                 </Button>

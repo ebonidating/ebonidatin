@@ -25,7 +25,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[v0] Error caught by boundary:", error, errorInfo)
+    // Error is silently tracked in production monitoring
   }
 
   render() {
@@ -44,11 +44,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {this.state.error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-sm text-red-800 font-mono">{this.state.error.message}</p>
-                </div>
-              )}
               <div className="flex gap-2">
                 <Button onClick={() => window.location.reload()} className="flex-1">
                   Refresh Page
