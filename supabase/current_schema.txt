@@ -1,0 +1,419 @@
+                                                                     Table "core.profiles"
+         Column          |            Type             | Collation | Nullable |          Default          | Storage  | Compression | Stats target | Description 
+-------------------------+-----------------------------+-----------+----------+---------------------------+----------+-------------+--------------+-------------
+ id                      | uuid                        |           | not null | gen_random_uuid()         | plain    |             |              | 
+ email                   | text                        |           | not null |                           | extended |             |              | 
+ full_name               | text                        |           |          |                           | extended |             |              | 
+ display_name            | text                        |           |          |                           | extended |             |              | 
+ bio                     | text                        |           |          |                           | extended |             |              | 
+ date_of_birth           | date                        |           |          |                           | plain    |             |              | 
+ gender                  | text                        |           |          |                           | extended |             |              | 
+ interested_in           | text[]                      |           |          |                           | extended |             |              | 
+ location                | text                        |           |          |                           | extended |             |              | 
+ city                    | text                        |           |          |                           | extended |             |              | 
+ state                   | text                        |           |          |                           | extended |             |              | 
+ country                 | text                        |           |          |                           | extended |             |              | 
+ profile_photo_url       | text                        |           |          |                           | extended |             |              | 
+ additional_photos       | text[]                      |           |          |                           | extended |             |              | 
+ interests               | text[]                      |           |          |                           | extended |             |              | 
+ looking_for             | text                        |           |          |                           | extended |             |              | 
+ membership_tier         | text                        |           |          | 'starter'::text           | extended |             |              | 
+ is_verified             | boolean                     |           |          | false                     | plain    |             |              | 
+ is_active               | boolean                     |           |          | true                      | plain    |             |              | 
+ last_active             | timestamp with time zone    |           |          | now()                     | plain    |             |              | 
+ created_at              | timestamp with time zone    |           |          | now()                     | plain    |             |              | 
+ updated_at              | timestamp with time zone    |           |          | now()                     | plain    |             |              | 
+ phone                   | character varying(20)       |           |          |                           | extended |             |              | 
+ user_type               | character varying(20)       |           |          | 'user'::character varying | extended |             |              | 
+ email_verified          | boolean                     |           |          | false                     | plain    |             |              | 
+ terms_accepted          | boolean                     |           |          | false                     | plain    |             |              | 
+ terms_accepted_at       | timestamp with time zone    |           |          |                           | plain    |             |              | 
+ verification_badge      | text                        |           |          |                           | extended |             |              | 
+ followers_count         | integer                     |           |          | 0                         | plain    |             |              | 
+ following_count         | integer                     |           |          | 0                         | plain    |             |              | 
+ subscription_tier       | text                        |           |          | 'free'::text              | extended |             |              | 
+ subscription_expires_at | timestamp without time zone |           |          |                           | plain    |             |              | 
+ gallery_access          | boolean                     |           |          | false                     | plain    |             |              | 
+ is_public               | boolean                     |           |          | false                     | plain    |             |              | 
+Indexes:
+    "profiles_pkey" PRIMARY KEY, btree (id)
+    "profiles_email_key" UNIQUE CONSTRAINT, btree (email)
+Check constraints:
+    "profiles_subscription_tier_check" CHECK (subscription_tier = ANY (ARRAY['free'::text, 'premium'::text, 'vip'::text, 'model_pro'::text]))
+    "profiles_user_type_check" CHECK (user_type::text = ANY (ARRAY['user'::character varying::text, 'model'::character varying::text]))
+Foreign-key constraints:
+    "profiles_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "social.blocks" CONSTRAINT "blocks_blocked_id_fkey" FOREIGN KEY (blocked_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "social.blocks" CONSTRAINT "blocks_blocker_id_fkey" FOREIGN KEY (blocker_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.chat_messages" CONSTRAINT "chat_messages_receiver_id_fkey" FOREIGN KEY (receiver_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.chat_messages" CONSTRAINT "chat_messages_sender_id_fkey" FOREIGN KEY (sender_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "social.likes" CONSTRAINT "likes_liked_id_fkey" FOREIGN KEY (liked_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "social.likes" CONSTRAINT "likes_liker_id_fkey" FOREIGN KEY (liker_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.matches" CONSTRAINT "matches_user_id_1_fkey" FOREIGN KEY (user_id_1) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.matches" CONSTRAINT "matches_user_id_2_fkey" FOREIGN KEY (user_id_2) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.messages" CONSTRAINT "messages_receiver_id_fkey" FOREIGN KEY (receiver_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "messaging.messages" CONSTRAINT "messages_sender_id_fkey" FOREIGN KEY (sender_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "analytics.model_awards" CONSTRAINT "model_awards_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "social.post_comments" CONSTRAINT "post_comments_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "social.post_likes" CONSTRAINT "post_likes_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "core.posts" CONSTRAINT "posts_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "analytics.rate_limits" CONSTRAINT "rate_limits_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "admin.reports" CONSTRAINT "reports_reported_id_fkey" FOREIGN KEY (reported_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "admin.reports" CONSTRAINT "reports_reporter_id_fkey" FOREIGN KEY (reporter_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "admin.reports" CONSTRAINT "reports_reviewed_by_fkey" FOREIGN KEY (reviewed_by) REFERENCES core.profiles(id)
+    TABLE "analytics.smart_matching_scores" CONSTRAINT "smart_matching_scores_match_id_fkey" FOREIGN KEY (match_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "analytics.smart_matching_scores" CONSTRAINT "smart_matching_scores_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "subscriptions" CONSTRAINT "subscriptions_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    TABLE "analytics.user_activity" CONSTRAINT "user_activity_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies:
+    POLICY "profiles_insert" FOR INSERT
+      WITH CHECK ((( SELECT auth.uid() AS uid) = id))
+    POLICY "profiles_select" FOR SELECT
+      USING (true)
+    POLICY "profiles_update" FOR UPDATE
+      USING ((( SELECT auth.uid() AS uid) = id))
+Publications:
+    "supabase_realtime"
+Triggers:
+    update_profiles_updated_at BEFORE UPDATE ON core.profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+Access method: heap
+
+                                                             Table "core.posts"
+     Column     |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+----------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id             | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ user_id        | uuid                     |           | not null |                   | plain    |             |              | 
+ title          | character varying(255)   |           | not null |                   | extended |             |              | 
+ description    | text                     |           |          |                   | extended |             |              | 
+ video_url      | text                     |           | not null |                   | extended |             |              | 
+ thumbnail_url  | text                     |           |          |                   | extended |             |              | 
+ views          | integer                  |           |          | 0                 | plain    |             |              | 
+ likes          | integer                  |           |          | 0                 | plain    |             |              | 
+ created_at     | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ updated_at     | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ image_url      | text                     |           |          |                   | extended |             |              | 
+ image_urls     | text[]                   |           |          |                   | extended |             |              | 
+ post_type      | text                     |           |          | 'photo'::text     | extended |             |              | 
+ likes_count    | integer                  |           |          | 0                 | plain    |             |              | 
+ comments_count | integer                  |           |          | 0                 | plain    |             |              | 
+ is_featured    | boolean                  |           |          | false             | plain    |             |              | 
+Indexes:
+    "posts_pkey" PRIMARY KEY, btree (id)
+    "idx_posts_user_id" btree (user_id)
+Foreign-key constraints:
+    "posts_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "social.post_comments" CONSTRAINT "post_comments_post_id_fkey" FOREIGN KEY (post_id) REFERENCES core.posts(id) ON DELETE CASCADE
+    TABLE "social.post_likes" CONSTRAINT "post_likes_post_id_fkey" FOREIGN KEY (post_id) REFERENCES core.posts(id) ON DELETE CASCADE
+Policies:
+    POLICY "posts_delete" FOR DELETE
+      USING ((( SELECT auth.uid() AS uid) = user_id))
+    POLICY "posts_insert" FOR INSERT
+      WITH CHECK ((( SELECT auth.uid() AS uid) = user_id))
+    POLICY "posts_select" FOR SELECT
+      USING (true)
+    POLICY "posts_update" FOR UPDATE
+      USING ((( SELECT auth.uid() AS uid) = user_id))
+Publications:
+    "supabase_realtime"
+Triggers:
+    posts_update_updated_at_tr BEFORE UPDATE ON core.posts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+Access method: heap
+
+                                                       Table "messaging.matches"
+   Column   |           Type           | Collation | Nullable |      Default      | Storage | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+-------------------+---------+-------------+--------------+-------------
+ id         | uuid                     |           | not null | gen_random_uuid() | plain   |             |              | 
+ user_id_1  | uuid                     |           | not null |                   | plain   |             |              | 
+ user_id_2  | uuid                     |           | not null |                   | plain   |             |              | 
+ matched_at | timestamp with time zone |           |          | now()             | plain   |             |              | 
+ is_active  | boolean                  |           |          | true              | plain   |             |              | 
+Indexes:
+    "matches_pkey" PRIMARY KEY, btree (id)
+    "idx_matches_user_id_2" btree (user_id_2)
+    "matches_user_id_1_user_id_2_key" UNIQUE CONSTRAINT, btree (user_id_1, user_id_2)
+Check constraints:
+    "matches_check" CHECK (user_id_1 < user_id_2)
+Foreign-key constraints:
+    "matches_user_id_1_fkey" FOREIGN KEY (user_id_1) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "matches_user_id_2_fkey" FOREIGN KEY (user_id_2) REFERENCES core.profiles(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "messaging.messages" CONSTRAINT "messages_match_id_fkey" FOREIGN KEY (match_id) REFERENCES messaging.matches(id) ON DELETE CASCADE
+Policies:
+    POLICY "Users can create matches" FOR INSERT
+      TO authenticated
+      WITH CHECK (((( SELECT auth.uid() AS uid) = user_id_1) OR (( SELECT auth.uid() AS uid) = user_id_2)))
+    POLICY "Users can update their own matches" FOR UPDATE
+      TO authenticated
+      USING (((( SELECT auth.uid() AS uid) = user_id_1) OR (( SELECT auth.uid() AS uid) = user_id_2)))
+      WITH CHECK (((( SELECT auth.uid() AS uid) = user_id_1) OR (( SELECT auth.uid() AS uid) = user_id_2)))
+    POLICY "Users can view their own matches" FOR SELECT
+      TO authenticated
+      USING (((( SELECT auth.uid() AS uid) = user_id_1) OR (( SELECT auth.uid() AS uid) = user_id_2)))
+Access method: heap
+
+                                                       Table "messaging.messages"
+   Column    |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id          | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ match_id    | uuid                     |           | not null |                   | plain    |             |              | 
+ sender_id   | uuid                     |           | not null |                   | plain    |             |              | 
+ receiver_id | uuid                     |           | not null |                   | plain    |             |              | 
+ content     | text                     |           | not null |                   | extended |             |              | 
+ is_read     | boolean                  |           |          | false             | plain    |             |              | 
+ sent_at     | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ read_at     | timestamp with time zone |           |          |                   | plain    |             |              | 
+Indexes:
+    "messages_pkey" PRIMARY KEY, btree (id)
+    "idx_messages_match_id" btree (match_id)
+    "idx_messages_receiver_id" btree (receiver_id)
+    "idx_messages_sender_id" btree (sender_id)
+Foreign-key constraints:
+    "messages_match_id_fkey" FOREIGN KEY (match_id) REFERENCES messaging.matches(id) ON DELETE CASCADE
+    "messages_receiver_id_fkey" FOREIGN KEY (receiver_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "messages_sender_id_fkey" FOREIGN KEY (sender_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+Triggers:
+    messages_broadcast_trigger AFTER INSERT OR DELETE OR UPDATE ON messaging.messages FOR EACH ROW EXECUTE FUNCTION messages_broadcast_trigger()
+Access method: heap
+
+                                                     Table "messaging.chat_messages"
+   Column    |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id          | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ sender_id   | uuid                     |           | not null |                   | plain    |             |              | 
+ receiver_id | uuid                     |           | not null |                   | plain    |             |              | 
+ message     | text                     |           | not null |                   | extended |             |              | 
+ read        | boolean                  |           |          | false             | plain    |             |              | 
+ created_at  | timestamp with time zone |           |          | now()             | plain    |             |              | 
+Indexes:
+    "chat_messages_pkey" PRIMARY KEY, btree (id)
+    "idx_chat_messages_receiver_id" btree (receiver_id)
+    "idx_chat_messages_sender_id" btree (sender_id)
+Foreign-key constraints:
+    "chat_messages_receiver_id_fkey" FOREIGN KEY (receiver_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "chat_messages_sender_id_fkey" FOREIGN KEY (sender_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+Publications:
+    "supabase_realtime"
+Access method: heap
+
+                                                        Table "social.likes"
+  Column  |           Type           | Collation | Nullable |      Default      | Storage | Compression | Stats target | Description 
+----------+--------------------------+-----------+----------+-------------------+---------+-------------+--------------+-------------
+ id       | uuid                     |           | not null | gen_random_uuid() | plain   |             |              | 
+ liker_id | uuid                     |           | not null |                   | plain   |             |              | 
+ liked_id | uuid                     |           | not null |                   | plain   |             |              | 
+ liked_at | timestamp with time zone |           |          | now()             | plain   |             |              | 
+Indexes:
+    "likes_pkey" PRIMARY KEY, btree (id)
+    "idx_likes_liked_id" btree (liked_id)
+    "likes_liker_id_liked_id_key" UNIQUE CONSTRAINT, btree (liker_id, liked_id)
+Foreign-key constraints:
+    "likes_liked_id_fkey" FOREIGN KEY (liked_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "likes_liker_id_fkey" FOREIGN KEY (liker_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies:
+    POLICY "Users can delete their own likes" FOR DELETE
+      TO authenticated
+      USING ((( SELECT auth.uid() AS uid) = liker_id))
+    POLICY "Users can insert their own likes" FOR INSERT
+      TO authenticated
+      WITH CHECK ((( SELECT auth.uid() AS uid) = liker_id))
+    POLICY "Users can view their own likes" FOR SELECT
+      TO authenticated
+      USING (((( SELECT auth.uid() AS uid) = liker_id) OR (( SELECT auth.uid() AS uid) = liked_id)))
+Publications:
+    "supabase_realtime"
+Triggers:
+    check_mutual_like_trigger AFTER INSERT ON social.likes FOR EACH ROW EXECUTE FUNCTION check_mutual_like()
+    likes_check_mutual_tr AFTER INSERT ON social.likes FOR EACH ROW EXECUTE FUNCTION check_mutual_like()
+    likes_update_post_likes_tr AFTER INSERT OR DELETE ON social.likes FOR EACH ROW EXECUTE FUNCTION update_post_likes_count()
+Access method: heap
+
+                                                         Table "social.blocks"
+   Column   |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id         | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ blocker_id | uuid                     |           | not null |                   | plain    |             |              | 
+ blocked_id | uuid                     |           | not null |                   | plain    |             |              | 
+ blocked_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ reason     | text                     |           |          |                   | extended |             |              | 
+Indexes:
+    "blocks_pkey" PRIMARY KEY, btree (id)
+    "blocks_blocker_id_blocked_id_key" UNIQUE CONSTRAINT, btree (blocker_id, blocked_id)
+    "idx_blocks_blocked_id" btree (blocked_id)
+Foreign-key constraints:
+    "blocks_blocked_id_fkey" FOREIGN KEY (blocked_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "blocks_blocker_id_fkey" FOREIGN KEY (blocker_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+Access method: heap
+
+                                                        Table "social.user_follows"
+    Column    |            Type             | Collation | Nullable |      Default      | Storage | Compression | Stats target | Description 
+--------------+-----------------------------+-----------+----------+-------------------+---------+-------------+--------------+-------------
+ id           | uuid                        |           | not null | gen_random_uuid() | plain   |             |              | 
+ follower_id  | uuid                        |           | not null |                   | plain   |             |              | 
+ following_id | uuid                        |           | not null |                   | plain   |             |              | 
+ created_at   | timestamp without time zone |           | not null | now()             | plain   |             |              | 
+Indexes:
+    "user_follows_pkey" PRIMARY KEY, btree (id)
+    "idx_user_follows_following_id" btree (following_id)
+    "user_follows_follower_id_following_id_key" UNIQUE CONSTRAINT, btree (follower_id, following_id)
+Check constraints:
+    "user_follows_check" CHECK (follower_id <> following_id)
+Foreign-key constraints:
+    "user_follows_follower_id_fkey" FOREIGN KEY (follower_id) REFERENCES auth.users(id) ON DELETE CASCADE
+    "user_follows_following_id_fkey" FOREIGN KEY (following_id) REFERENCES auth.users(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+Publications:
+    "supabase_realtime"
+Access method: heap
+
+                                                       Table "social.post_likes"
+   Column   |           Type           | Collation | Nullable |      Default      | Storage | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+-------------------+---------+-------------+--------------+-------------
+ id         | uuid                     |           | not null | gen_random_uuid() | plain   |             |              | 
+ post_id    | uuid                     |           | not null |                   | plain   |             |              | 
+ user_id    | uuid                     |           | not null |                   | plain   |             |              | 
+ created_at | timestamp with time zone |           |          | now()             | plain   |             |              | 
+Indexes:
+    "post_likes_pkey" PRIMARY KEY, btree (id)
+    "idx_post_likes_user_id" btree (user_id)
+    "post_likes_post_id_user_id_key" UNIQUE CONSTRAINT, btree (post_id, user_id)
+Foreign-key constraints:
+    "post_likes_post_id_fkey" FOREIGN KEY (post_id) REFERENCES core.posts(id) ON DELETE CASCADE
+    "post_likes_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies:
+    POLICY "post_likes_select_combined" FOR SELECT
+      TO anon,authenticated,authenticator
+      USING ((((( SELECT auth.uid() AS uid))::text = (user_id)::text) OR (( SELECT auth.role() AS role) = ANY (ARRAY['service_role'::text, 'admin'::text]))))
+Triggers:
+    update_post_likes_count_trigger AFTER INSERT OR DELETE ON social.post_likes FOR EACH ROW EXECUTE FUNCTION update_post_likes_count()
+Access method: heap
+
+                                                      Table "social.post_comments"
+   Column   |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id         | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ post_id    | uuid                     |           | not null |                   | plain    |             |              | 
+ user_id    | uuid                     |           | not null |                   | plain    |             |              | 
+ content    | text                     |           | not null |                   | extended |             |              | 
+ created_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ updated_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+Indexes:
+    "post_comments_pkey" PRIMARY KEY, btree (id)
+    "idx_post_comments_post_id" btree (post_id)
+    "idx_post_comments_user_id" btree (user_id)
+Foreign-key constraints:
+    "post_comments_post_id_fkey" FOREIGN KEY (post_id) REFERENCES core.posts(id) ON DELETE CASCADE
+    "post_comments_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies (row security enabled): (none)
+Publications:
+    "supabase_realtime"
+Triggers:
+    update_post_comments_count_trigger AFTER INSERT OR DELETE ON social.post_comments FOR EACH ROW EXECUTE FUNCTION update_post_comments_count()
+Access method: heap
+
+                                                       Table "admin.admin_users"
+   Column   |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id         | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ user_id    | uuid                     |           |          |                   | plain    |             |              | 
+ email      | text                     |           | not null |                   | extended |             |              | 
+ role       | text                     |           | not null | 'admin'::text     | extended |             |              | 
+ created_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ updated_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+Indexes:
+    "admin_users_pkey" PRIMARY KEY, btree (id)
+    "admin_users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "idx_admin_users_user_id" btree (user_id)
+Check constraints:
+    "admin_users_role_check" CHECK (role = ANY (ARRAY['admin'::text, 'super_admin'::text]))
+Foreign-key constraints:
+    "admin_users_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+Policies:
+    POLICY "admin_users_full_access"
+      TO anon,authenticated,authenticator,cli_login_postgres
+      USING (((( SELECT auth.role() AS role) = 'super_admin'::text) OR ((( SELECT auth.uid() AS uid))::text = (user_id)::text)))
+      WITH CHECK (((( SELECT auth.role() AS role) = 'super_admin'::text) OR ((( SELECT auth.uid() AS uid))::text = (user_id)::text)))
+Access method: heap
+
+                                                          Table "admin.reports"
+   Column    |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id          | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ reporter_id | uuid                     |           | not null |                   | plain    |             |              | 
+ reported_id | uuid                     |           | not null |                   | plain    |             |              | 
+ reason      | text                     |           | not null |                   | extended |             |              | 
+ description | text                     |           |          |                   | extended |             |              | 
+ status      | text                     |           |          | 'pending'::text   | extended |             |              | 
+ reported_at | timestamp with time zone |           |          | now()             | plain    |             |              | 
+ reviewed_at | timestamp with time zone |           |          |                   | plain    |             |              | 
+ reviewed_by | uuid                     |           |          |                   | plain    |             |              | 
+Indexes:
+    "reports_pkey" PRIMARY KEY, btree (id)
+    "idx_reports_reported_id" btree (reported_id)
+    "idx_reports_reporter_id" btree (reporter_id)
+    "idx_reports_reviewed_by" btree (reviewed_by)
+Foreign-key constraints:
+    "reports_reported_id_fkey" FOREIGN KEY (reported_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "reports_reporter_id_fkey" FOREIGN KEY (reporter_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+    "reports_reviewed_by_fkey" FOREIGN KEY (reviewed_by) REFERENCES core.profiles(id)
+Policies:
+    POLICY "Users can insert their own reports" FOR INSERT
+      WITH CHECK ((( SELECT auth.uid() AS uid) = reporter_id))
+    POLICY "Users can view their own reports" FOR SELECT
+      USING (((( SELECT auth.uid() AS uid) = reporter_id) OR (( SELECT auth.uid() AS uid) = reported_id)))
+Publications:
+    "supabase_realtime"
+Access method: heap
+
+                                                           Table "admin.verified_users"
+      Column       |            Type             | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+-------------------+-----------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id                | uuid                        |           | not null | gen_random_uuid() | plain    |             |              | 
+ user_id           | uuid                        |           | not null |                   | plain    |             |              | 
+ verified_at       | timestamp without time zone |           | not null | now()             | plain    |             |              | 
+ verification_type | text                        |           | not null |                   | extended |             |              | 
+ verified_by       | uuid                        |           |          |                   | plain    |             |              | 
+ created_at        | timestamp without time zone |           | not null | now()             | plain    |             |              | 
+Indexes:
+    "verified_users_pkey" PRIMARY KEY, btree (id)
+    "idx_verified_users_verified_by" btree (verified_by)
+    "verified_users_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Check constraints:
+    "verified_users_verification_type_check" CHECK (verification_type = ANY (ARRAY['email'::text, 'phone'::text, 'id'::text, 'model'::text]))
+Foreign-key constraints:
+    "verified_users_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
+    "verified_users_verified_by_fkey" FOREIGN KEY (verified_by) REFERENCES auth.users(id)
+Policies:
+    POLICY "verified_users_select_combined" FOR SELECT
+      TO anon,authenticated,authenticator
+      USING (((( SELECT auth.role() AS role) = 'super_admin'::text) OR ((( SELECT auth.uid() AS uid))::text = (user_id)::text)))
+Publications:
+    "supabase_realtime"
+Access method: heap
+
+                                                     Table "analytics.model_awards"
+   Column    |           Type           | Collation | Nullable |      Default      | Storage  | Compression | Stats target | Description 
+-------------+--------------------------+-----------+----------+-------------------+----------+-------------+--------------+-------------
+ id          | uuid                     |           | not null | gen_random_uuid() | plain    |             |              | 
+ user_id     | uuid                     |           | not null |                   | plain    |             |              | 
+ award_type  | text                     |           | not null |                   | extended |             |              | 
+ award_date  | date                     |           | not null |                   | plain    |             |              | 
+ total_likes | integer                  |           | not null |                   | plain    |             |              | 
+ rank        | integer                  |           |          |                   | plain    |             |              | 
+ created_at  | timestamp with time zone |           |          | now()             | plain    |             |              | 
+Indexes:
+    "model_awards_pkey" PRIMARY KEY, btree (id)
+    "model_awards_user_id_award_type_award_date_key" UNIQUE CONSTRAINT, btree (user_id, award_type, award_date)
+Foreign-key constraints:
+    "model_awards_user_id_fkey" FOREIGN KEY (user_id) REFERENCES core.profiles(id) ON DELETE CASCADE
+Policies:
+    POLICY "Anyone can view model awards" FOR SELECT
+      USING (true)
+Publications:
+    "supabase_realtime"
+Access method: heap
+
