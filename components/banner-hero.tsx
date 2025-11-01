@@ -21,7 +21,8 @@ export function BannerHero({ image, title, subtitle, cta, overlay = true }: Bann
       {/* Background Image */}
       <img
         src={image || "/placeholder.svg"}
-        alt={title}
+        alt=""
+        role="presentation"
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
 
@@ -41,11 +42,11 @@ export function BannerHero({ image, title, subtitle, cta, overlay = true }: Bann
               <Button
                 asChild
                 size="lg"
-                className="bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transition-all"
+                className="bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transition-all min-h-[44px] px-6"
               >
                 <Link href={cta.href} className="flex items-center gap-2">
                   {cta.text}
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
               </Button>
             </div>

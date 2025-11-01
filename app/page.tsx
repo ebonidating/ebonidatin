@@ -43,7 +43,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image 
@@ -66,18 +66,20 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-8">
-        <BannerHero
-          image="/model-1.jpg"
-          title="Find Love Within the Black Community"
-          subtitle="Join thousands of Black singles worldwide finding meaningful connections, love, and friendship in a culturally-rich, safe environment designed for our community."
-          cta={{ text: "Get Started Free", href: "/auth/sign-up" }}
-        />
-      </section>
+      {/* Main Content */}
+      <main>
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-8">
+          <BannerHero
+            image="/model-1.jpg"
+            title="Find Love Within the Black Community"
+            subtitle="Join thousands of Black singles worldwide finding meaningful connections, love, and friendship in a culturally-rich, safe environment designed for our community."
+            cta={{ text: "Get Started Free", href: "/auth/sign-up" }}
+          />
+        </section>
 
-      {/* Top Models Section */}
-      <section className="container mx-auto px-4 py-16">
+        {/* Top Models Section */}
+        <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Top Models</h2>
           <p className="text-lg text-gray-600">Meet our most popular members</p>
@@ -175,7 +177,7 @@ export default function HomePage() {
               Reach thousands of engaged users in the Black community. Promote your products, services, or brand.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary" className="bg-white text-amber-600 hover:bg-gray-100">
+              <Button asChild size="lg" variant="secondary" className="bg-white text-amber-600 hover:bg-amber-50 min-h-[44px]">
                 <Link href="/advertise">Learn More</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
@@ -186,18 +188,19 @@ export default function HomePage() {
         </Card>
       </section>
 
-      {/* Bottom CTA */}
-      <section className="container mx-auto px-4 py-16">
-        <BannerHero
-          image="/model-2.jpg"
-          title="Ready to Find Your Match?"
-          subtitle="Join our community today and start connecting with amazing people who share your values and interests."
-          cta={{ text: "Sign Up Now", href: "/auth/sign-up" }}
-        />
-      </section>
+        {/* Bottom CTA */}
+        <section className="container mx-auto px-4 py-16">
+          <BannerHero
+            image="/model-2.jpg"
+            title="Ready to Find Your Match?"
+            subtitle="Join our community today and start connecting with amazing people who share your values and interests."
+            cta={{ text: "Sign Up Now", href: "/auth/sign-up" }}
+          />
+        </section>
+      </main>
 
       {/* Footer */}
-      <footer className="border-t bg-white mt-16">
+      <footer className="border-t bg-white mt-16" role="contentinfo">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
