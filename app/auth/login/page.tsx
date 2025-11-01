@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
+import { useRecaptcha } from "@/hooks/use-recaptcha"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -17,6 +18,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const errorRef = useRef<HTMLDivElement>(null)
+  const { executeRecaptcha } = useRecaptcha()
 
   useEffect(() => {
     if (error && errorRef.current) {
@@ -31,6 +33,24 @@ export default function LoginPage() {
     setError(null)
 
     try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeRecaptcha("LOGIN")
+      
+      if (recaptchaToken) {
+        // Verify reCAPTCHA token
+        const verifyResponse = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: recaptchaToken, action: "LOGIN" }),
+        })
+
+        const verifyData = await verifyResponse.json()
+
+        if (!verifyData.success) {
+          throw new Error("Security verification failed. Please try again.")
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

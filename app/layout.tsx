@@ -131,6 +131,12 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         
+        {/* reCAPTCHA Enterprise */}
+        <Script
+          src={`https://www.google.com/recaptcha/enterprise.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
+          strategy="afterInteractive"
+        />
+        
         {/* Service Worker Registration */}
         <Script id="sw-register" strategy="afterInteractive">
           {`

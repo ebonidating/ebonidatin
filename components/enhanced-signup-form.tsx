@@ -15,10 +15,12 @@ import { Loader2, Mail, Lock, User, Eye, EyeOff, Phone, MapPin, Calendar } from 
 import Link from "next/link"
 import { Country, City } from "country-state-city"
 import PhoneInput from "react-phone-number-input"
+import { useRecaptcha } from "@/hooks/use-recaptcha"
 
 
 export function EnhancedSignupForm() {
   const router = useRouter()
+  const { executeRecaptcha } = useRecaptcha()
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -130,6 +132,24 @@ export function EnhancedSignupForm() {
     setLoading(true)
 
     try {
+      // Execute reCAPTCHA
+      const recaptchaToken = await executeRecaptcha("SIGNUP")
+      
+      if (recaptchaToken) {
+        // Verify reCAPTCHA token
+        const verifyResponse = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: recaptchaToken, action: "SIGNUP" }),
+        })
+
+        const verifyData = await verifyResponse.json()
+
+        if (!verifyData.success) {
+          throw new Error("Security verification failed. Please try again.")
+        }
+      }
+
       const supabase = createClient()
       const redirectUrl = `${window.location.origin}/auth/callback`
 
