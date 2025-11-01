@@ -15,7 +15,6 @@ import { Loader2, Mail, Lock, User, Eye, EyeOff, Phone, MapPin, Calendar } from 
 import Link from "next/link"
 import { Country, City } from "country-state-city"
 import PhoneInput from "react-phone-number-input"
-import "react-phone-number-input/style.css"
 
 
 export function EnhancedSignupForm() {

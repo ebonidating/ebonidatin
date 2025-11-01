@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Heart, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 
 interface ModelOfPeriod {
   id: string
@@ -184,15 +183,6 @@ export function ModelOfPeriod({ models }: ModelOfPeriodProps) {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

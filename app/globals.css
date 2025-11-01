@@ -225,3 +225,42 @@
 .PhoneInputCountrySelect {
   margin-right: 0.5rem;
 }
+
+/* React Phone Number Input Styles */
+.PhoneInput {
+  display: flex;
+  align-items: center;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+.PhoneInputCountry {
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.PhoneInputCountryIcon {
+  width: 1.5rem;
+  height: 1rem;
+  margin-right: 0.25rem;
+}
+
+.PhoneInputCountrySelect {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.PhoneInputCountrySelectArrow {
+  opacity: 0.5;
+  margin-left: 0.25rem;
+}
