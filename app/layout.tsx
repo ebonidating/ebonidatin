@@ -3,9 +3,11 @@ import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { ThemeProvider } from "@/lib/theme/theme-provider"
+import Script from "next/script"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -38,6 +40,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  manifest: "/manifest.json",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -78,6 +81,11 @@ export const metadata: Metadata = {
     yandex: "your-yandex-verification-code",
   },
   generator: "v0.app",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Eboni Dating",
+  },
 }
 
 export const viewport = {
@@ -100,6 +108,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://cdn.vercel-insights.com" />
         <link rel="dns-prefetch" href="https://api.stripe.com" />
         <link rel="dns-prefetch" href="https://supabase.co" />
+        <link rel="icon" href="/eboni-logo.png" />
+        <link rel="apple-touch-icon" href="/eboni-logo.png" />
       </head>
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <ThemeProvider>
@@ -119,6 +129,60 @@ export default function RootLayout({
           </ErrorBoundary>
         </ThemeProvider>
         <Analytics />
+        <SpeedInsights />
+        
+        {/* Service Worker Registration */}
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(
+                  function(registration) {
+                    console.log('ServiceWorker registration successful');
+                  },
+                  function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  }
+                );
+              });
+            }
+          `}
+        </Script>
+
+        {/* Web Vitals Tracking */}
+        <Script id="web-vitals" strategy="afterInteractive">
+          {`
+            function sendToAnalytics(metric) {
+              const body = JSON.stringify(metric);
+              const url = '/api/analytics';
+              
+              if (navigator.sendBeacon) {
+                navigator.sendBeacon(url, body);
+              } else {
+                fetch(url, { body, method: 'POST', keepalive: true });
+              }
+            }
+            
+            if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
+              try {
+                const observer = new PerformanceObserver((list) => {
+                  for (const entry of list.getEntries()) {
+                    sendToAnalytics({
+                      name: entry.name,
+                      value: entry.value || entry.duration,
+                      rating: entry.rating,
+                      delta: entry.delta,
+                      id: entry.id,
+                    });
+                  }
+                });
+                observer.observe({ entryTypes: ['web-vitals'] });
+              } catch (err) {
+                console.log('Web Vitals observer error:', err);
+              }
+            }
+          `}
+        </Script>
       </body>
     </html>
   )

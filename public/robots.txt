@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /messages/
+Disallow: /onboarding/
+
+# Sitemaps
+Sitemap: https://ebonidating.com/sitemap.xml

@@ -1,10 +1,16 @@
 import Link from "next/link"
+import Image from "next/image"
 import { BannerHero } from "@/components/banner-hero"
 import { ModelOfPeriod } from "@/components/model-of-period"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Zap, MessageCircle, Users, Heart, Lock, Star } from "lucide-react"
+
+export const metadata = {
+  title: "Home - Find Love in the Black Community",
+  description: "Join thousands of Black singles worldwide finding meaningful connections, love, and friendship in a culturally-rich, safe environment.",
+}
 
 export default function HomePage() {
   const models = [
@@ -40,7 +46,13 @@ export default function HomePage() {
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/eboni-logo.png" alt="Eboni Dating" className="h-8 w-8" />
+            <Image 
+              src="/eboni-logo.png" 
+              alt="Eboni Dating" 
+              width={32} 
+              height={32}
+              priority
+            />
             <span className="text-xl font-bold text-gray-900">Eboni Dating</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -234,7 +246,12 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <img src="/eboni-logo.png" alt="Eboni Dating" className="h-5 w-5" />
+              <Image 
+                src="/eboni-logo.png" 
+                alt="Eboni Dating" 
+                width={20} 
+                height={20}
+              />
               <span className="font-semibold text-gray-900">Eboni Dating</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-600">
