@@ -225,7 +225,11 @@ export function EnhancedSignupForm() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/onboarding`,
+          redirectTo: `${window.location.origin}/api/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         },
       })
       
@@ -282,21 +286,21 @@ export function EnhancedSignupForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
-        <CardDescription className="text-center">
+        <CardTitle className="text-3xl font-bold text-center">Create Account</CardTitle>
+        <CardDescription className="text-center text-base">
           Join thousands of singles finding love worldwide
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSignUp} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSignUp} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Name */}
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name *</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <User className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                 <Input
                   id="fullName"
                   name="fullName"
@@ -315,7 +319,7 @@ export function EnhancedSignupForm() {
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                 <Input
                   id="email"
                   name="email"
@@ -334,7 +338,7 @@ export function EnhancedSignupForm() {
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">Date of Birth *</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                 <Input
                   id="dateOfBirth"
                   name="dateOfBirth"
@@ -434,7 +438,7 @@ export function EnhancedSignupForm() {
             <div className="space-y-2">
               <Label htmlFor="password">Password *</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                 <Input
                   id="password"
                   name="password"
@@ -463,7 +467,7 @@ export function EnhancedSignupForm() {
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password *</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -514,10 +518,10 @@ export function EnhancedSignupForm() {
           )}
 
           {/* Submit Button */}
-          <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700" disabled={loading}>
+          <Button type="submit" className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 Creating Account...
               </>
             ) : (
@@ -526,7 +530,7 @@ export function EnhancedSignupForm() {
           </Button>
 
           {/* Divider */}
-          <div className="relative">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -539,11 +543,11 @@ export function EnhancedSignupForm() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full h-12 text-base"
             onClick={handleGoogleSignUp}
             disabled={loading}
           >
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+            <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
