@@ -25,7 +25,6 @@ export function EnhancedSignupForm() {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
     dateOfBirth: "",
     gender: "",
     phone: "",
@@ -33,7 +32,6 @@ export function EnhancedSignupForm() {
     city: "",
   })
   const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -71,9 +69,9 @@ export function EnhancedSignupForm() {
   }
 
   const validateForm = () => {
-    const { fullName, email, password, confirmPassword, dateOfBirth, gender, phone, country, city } = formData
+    const { fullName, email, password, dateOfBirth, gender, phone, country, city } = formData
 
-    if (!fullName || !email || !password || !confirmPassword || !dateOfBirth || !gender || !phone || !country || !city) {
+    if (!fullName || !email || !password || !dateOfBirth || !gender || !phone || !country || !city) {
       setError("All fields are required")
       return false
     }
@@ -105,11 +103,6 @@ export function EnhancedSignupForm() {
 
     if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
       setError("Password must contain uppercase, lowercase, and numbers")
-      return false
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match")
       return false
     }
 
@@ -266,7 +259,7 @@ export function EnhancedSignupForm() {
               variant="link"
               onClick={() => {
                 setSuccess(false)
-                setFormData({ fullName: "", email: "", password: "", confirmPassword: "" })
+                setFormData({ fullName: "", email: "", password: "", dateOfBirth: "", gender: "", phone: "", country: "", city: "" })
               }}
               className="text-amber-600 p-0 h-auto"
             >
@@ -435,7 +428,7 @@ export function EnhancedSignupForm() {
             </div>
 
             {/* Password */}
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <Label htmlFor="password">Password *</Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
@@ -454,39 +447,14 @@ export function EnhancedSignupForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Must contain uppercase, lowercase, and numbers
+                Must contain uppercase, lowercase, and numbers (minimum 8 characters)
               </p>
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password *</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Re-enter password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="pl-10 pr-10"
-                  disabled={loading}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
             </div>
           </div>
 
