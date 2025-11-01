@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heart, X, Star, MapPin, Briefcase, GraduationCap, Info, ChevronLeft, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useToast } from "@/hooks/use-toast"
+import { ProfileBadges, getUserBadges, type BadgeType } from "@/components/profile-badges"
 
 interface Profile {
   id: string
@@ -22,6 +23,13 @@ interface Profile {
   education?: string
   photos?: string[]
   distance?: number
+  subscription_tier?: string
+  email_verified?: boolean
+  photo_verified?: boolean
+  created_at?: string
+  last_active?: string
+  is_popular?: boolean
+  message_response_rate?: number
 }
 
 interface SwipeCardStackProps {
@@ -269,9 +277,19 @@ export function SwipeCardStack({ userId, initialProfiles }: SwipeCardStackProps)
                       variant="ghost"
                       className="text-white hover:bg-white/20"
                       onClick={() => setShowDetails(!showDetails)}
+                      aria-label="Show details"
                     >
                       <Info className="h-5 w-5" />
                     </Button>
+                  </div>
+
+                  {/* Profile Badges */}
+                  <div className="mb-2">
+                    <ProfileBadges 
+                      badges={getUserBadges(currentProfile)} 
+                      size="sm"
+                      maxDisplay={4}
+                    />
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">

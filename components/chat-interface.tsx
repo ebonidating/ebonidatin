@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Video, Loader2 } from "lucide-react"
+import { Send, Video, Loader2, Sparkles } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Icebreakers } from "@/components/icebreakers"
 
 interface Message {
   id: string
@@ -39,6 +40,7 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showIcebreakers, setShowIcebreakers] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const supabase = createClient()
 
@@ -180,7 +182,18 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
         <ScrollArea className="flex-1 p-4" ref={scrollRef}>
           <div className="space-y-4">
             {messages.length === 0 ? (
-              <div className="text-center text-muted-foreground py-8">No messages yet. Start the conversation!</div>
+              <div className="space-y-4">
+                <div className="text-center text-muted-foreground py-4">
+                  No messages yet. Start the conversation!
+                </div>
+                {/* Show icebreakers when no messages */}
+                <Icebreakers
+                  onSelectIcebreaker={(text) => {
+                    setNewMessage(text)
+                    setShowIcebreakers(false)
+                  }}
+                />
+              </div>
             ) : (
               messages.map((msg) => {
                 const isSender = msg.sender_id === currentUserId
@@ -206,7 +219,33 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
           </div>
         </ScrollArea>
 
-        <form onSubmit={handleSendMessage} className="p-4 border-t">
+        <form onSubmit={handleSendMessage} className="p-4 border-t space-y-2">
+          {/* Toggle button for icebreakers */}
+          {messages.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowIcebreakers(!showIcebreakers)}
+              className="w-full mb-2"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {showIcebreakers ? 'Hide' : 'Show'} Conversation Starters
+            </Button>
+          )}
+          
+          {/* Icebreakers */}
+          {showIcebreakers && messages.length > 0 && (
+            <div className="mb-2">
+              <Icebreakers
+                onSelectIcebreaker={(text) => {
+                  setNewMessage(text)
+                  setShowIcebreakers(false)
+                }}
+              />
+            </div>
+          )}
+
           <div className="flex gap-2">
             <Input
               value={newMessage}
@@ -214,7 +253,7 @@ export function ChatInterface({ currentUserId, otherUserId, otherUserProfile, on
               placeholder="Type a message..."
               disabled={sending}
             />
-            <Button type="submit" disabled={sending || !newMessage.trim()} size="icon">
+            <Button type="submit" disabled={sending || !newMessage.trim()} size="icon" aria-label="Send message">
               {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </div>
