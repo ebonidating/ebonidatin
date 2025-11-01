@@ -76,8 +76,12 @@ export default function HomePage() {
         />
       </section>
 
-      {/* Model of the Day */}
+      {/* Top Models Section */}
       <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Top Models</h2>
+          <p className="text-lg text-gray-600">Meet our most popular members</p>
+        </div>
         <ModelOfPeriod models={models} />
       </section>
 
@@ -162,73 +166,24 @@ export default function HomePage() {
         </Card>
       </section>
 
-      {/* Membership Tiers */}
+      {/* Advertise Section */}
       <section className="container mx-auto px-4 py-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Membership Tiers</h2>
-            <p className="text-lg text-gray-600">Choose the plan that fits your dating journey</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="text-center hover:shadow-lg transition-shadow border-2">
-              <CardHeader>
-                <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-gray-600" />
-                </div>
-                <CardTitle className="text-lg">Basic</CardTitle>
-                <CardDescription>Essential features for free members</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-gray-900 mb-4">Free</p>
-                <Button variant="outline" asChild className="w-full bg-transparent">
-                  <Link href="/auth/sign-up">Get Started</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow border-2 border-amber-200 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-amber-600">Most Popular</Badge>
-              </div>
-              <CardHeader>
-                <div className="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                  <Heart className="h-8 w-8 text-amber-600" />
-                </div>
-                <CardTitle className="text-lg">Premium</CardTitle>
-                <CardDescription>Unlimited messaging and priority support</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-gray-900 mb-4">$9.99/mo</p>
-                <Button asChild className="w-full bg-amber-600 hover:bg-amber-700">
-                  <Link href="/pricing">Upgrade Now</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow border-2">
-              <CardHeader>
-                <div className="h-16 w-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-                  <Lock className="h-8 w-8 text-orange-600" />
-                </div>
-                <CardTitle className="text-lg">VIP</CardTitle>
-                <CardDescription>Exclusive access to premium events and features</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold text-gray-900 mb-4">$19.99/mo</p>
-                <Button variant="outline" asChild className="w-full bg-transparent">
-                  <Link href="/pricing">Learn More</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="text-center mt-8">
-            <Button asChild size="lg" className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/pricing">View All Plans</Link>
-            </Button>
-          </div>
-        </div>
+        <Card className="max-w-4xl mx-auto bg-gradient-to-r from-amber-600 to-orange-600 border-0 text-white">
+          <CardContent className="p-8 md:p-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Advertise Your Business</h2>
+            <p className="text-lg mb-6 opacity-90">
+              Reach thousands of engaged users in the Black community. Promote your products, services, or brand.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" variant="secondary" className="bg-white text-amber-600 hover:bg-gray-100">
+                <Link href="/advertise">Learn More</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                <Link href="/contact">Contact Sales</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       {/* Bottom CTA */}

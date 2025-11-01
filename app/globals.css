@@ -207,3 +207,21 @@
 .mirror {
   transform: scaleX(-1);
 }
+
+/* React Phone Input Styles */
+.PhoneInput {
+  display: flex;
+  align-items: center;
+}
+
+.PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.PhoneInputCountrySelect {
+  margin-right: 0.5rem;
+}

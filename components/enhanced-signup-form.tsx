@@ -8,10 +8,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, ShieldCheck, Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { Loader2, Mail, Lock, User, Eye, EyeOff, Phone, MapPin, Calendar } from "lucide-react"
 import Link from "next/link"
+import { Country, City } from "country-state-city"
+import PhoneInput from "react-phone-number-input"
+import "react-phone-number-input/style.css"
 
 
 export function EnhancedSignupForm() {
@@ -21,6 +25,11 @@ export function EnhancedSignupForm() {
     email: "",
     password: "",
     confirmPassword: "",
+    dateOfBirth: "",
+    gender: "",
+    phone: "",
+    country: "",
+    city: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -28,16 +37,42 @@ export function EnhancedSignupForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [cities, setCities] = useState<any[]>([])
+
+  const countries = Country.getAllCountries()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     setError(null)
   }
 
-  const validateForm = () => {
-    const { fullName, email, password, confirmPassword } = formData
+  const handleCountryChange = (value: string) => {
+    setFormData({ ...formData, country: value, city: "" })
+    const country = countries.find(c => c.name === value)
+    if (country) {
+      const countryCities = City.getCitiesOfCountry(country.isoCode) || []
+      setCities(countryCities)
+    }
+    setError(null)
+  }
 
-    if (!fullName || !email || !password || !confirmPassword) {
+  const validateAge = (dob: string) => {
+    const birthDate = new Date(dob)
+    const today = new Date()
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    
+    return age >= 18
+  }
+
+  const validateForm = () => {
+    const { fullName, email, password, confirmPassword, dateOfBirth, gender, phone, country, city } = formData
+
+    if (!fullName || !email || !password || !confirmPassword || !dateOfBirth || !gender || !phone || !country || !city) {
       setError("All fields are required")
       return false
     }
@@ -49,6 +84,16 @@ export function EnhancedSignupForm() {
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Please enter a valid email address")
+      return false
+    }
+
+    if (!validateAge(dateOfBirth)) {
+      setError("You must be at least 18 years old to register")
+      return false
+    }
+
+    if (!phone || phone.length < 10) {
+      setError("Please enter a valid phone number")
       return false
     }
 
@@ -97,6 +142,11 @@ export function EnhancedSignupForm() {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: formData.fullName,
+            date_of_birth: formData.dateOfBirth,
+            gender: formData.gender,
+            phone: formData.phone,
+            country: formData.country,
+            city: formData.city,
           },
         },
       })
@@ -109,6 +159,11 @@ export function EnhancedSignupForm() {
           id: authData.user.id,
           email: authData.user.email,
           full_name: formData.fullName,
+          date_of_birth: formData.dateOfBirth,
+          gender: formData.gender,
+          phone: formData.phone,
+          country: formData.country,
+          city: formData.city,
           subscription_tier: "free",
           email_verified: false,
           created_at: new Date().toISOString(),
@@ -208,110 +263,212 @@ export function EnhancedSignupForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
         <CardDescription className="text-center">
-          Join thousands of singles finding love
+          Join thousands of singles finding love worldwide
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignUp} className="space-y-4">
-          {/* Full Name */}
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="fullName"
-                name="fullName"
-                type="text"
-                placeholder="John Doe"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="pl-10"
-                disabled={loading}
-                required
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Full Name */}
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Full Name *</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className="pl-10"
+                  disabled={loading}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                className="pl-10"
-                disabled={loading}
-                required
-              />
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="pl-10"
+                  disabled={loading}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Password */}
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Minimum 8 characters"
-                value={formData.password}
-                onChange={handleChange}
-                className="pl-10 pr-10"
+            {/* Date of Birth */}
+            <div className="space-y-2">
+              <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className="pl-10"
+                  disabled={loading}
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Must be 18 or older</p>
+            </div>
+
+            {/* Gender */}
+            <div className="space-y-2">
+              <Label htmlFor="gender">Gender *</Label>
+              <Select
+                value={formData.gender}
+                onValueChange={(value) => setFormData({ ...formData, gender: value })}
                 disabled={loading}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+                <SelectTrigger id="gender">
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="non-binary">Non-Binary</SelectItem>
+                  <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Must contain uppercase, lowercase, and numbers
-            </p>
-          </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Re-enter password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="pl-10 pr-10"
+            {/* Phone */}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="phone">Phone Number *</Label>
+              <PhoneInput
+                international
+                defaultCountry="US"
+                value={formData.phone}
+                onChange={(value) => setFormData({ ...formData, phone: value || "" })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={loading}
-                required
               />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              <p className="text-xs text-muted-foreground">Include country code</p>
+            </div>
+
+            {/* Country */}
+            <div className="space-y-2">
+              <Label htmlFor="country">Country *</Label>
+              <Select
+                value={formData.country}
+                onValueChange={handleCountryChange}
+                disabled={loading}
               >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+                <SelectTrigger id="country">
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {countries.map((country) => (
+                    <SelectItem key={country.isoCode} value={country.name}>
+                      {country.flag} {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* City */}
+            <div className="space-y-2">
+              <Label htmlFor="city">City *</Label>
+              <Select
+                value={formData.city}
+                onValueChange={(value) => setFormData({ ...formData, city: value })}
+                disabled={loading || !formData.country}
+              >
+                <SelectTrigger id="city">
+                  <SelectValue placeholder={formData.country ? "Select city" : "Select country first"} />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {cities.length > 0 ? (
+                    cities.map((city) => (
+                      <SelectItem key={city.name} value={city.name}>
+                        {city.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="other" disabled>No cities available</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password">Password *</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Minimum 8 characters"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="pl-10 pr-10"
+                  disabled={loading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Must contain uppercase, lowercase, and numbers
+              </p>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password *</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Re-enter password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="pl-10 pr-10"
+                  disabled={loading}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Terms */}
-          <div className="flex items-start space-x-2">
+          <div className="flex items-start space-x-2 pt-4">
             <Checkbox
               id="terms"
               checked={termsAccepted}
