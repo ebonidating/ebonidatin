@@ -24,6 +24,9 @@ async function checkAdminAccess() {
   return { user, adminUser }
 }
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function AdminDashboard() {
   const { adminUser } = await checkAdminAccess()
 

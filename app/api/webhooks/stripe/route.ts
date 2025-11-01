@@ -1,4 +1,6 @@
 import { headers } from "next/headers"
+
+export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@/lib/supabase/server"

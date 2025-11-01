@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
+
 // In-memory store for analytics (use a database in production)
 const analytics: any[] = [];
 

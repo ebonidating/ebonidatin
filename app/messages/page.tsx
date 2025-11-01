@@ -2,6 +2,9 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import MessagesContent from "@/components/messages-content"
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function MessagesPage({
   searchParams,
 }: {

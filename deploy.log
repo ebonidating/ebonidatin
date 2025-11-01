@@ -1,10 +1,9 @@
 Vercel CLI 48.2.9
 Retrieving project…
 Deploying ebonidatings-projects/ebonidatin
-Uploading [--------------------] (0.0B/83B)
-Uploading [====================] (83.0B/83B)
-Inspect: https://vercel.com/ebonidatings-projects/ebonidatin/DPwQ1HuKyxgGSuVFjbne1FhybaUM [5s]
-Production: https://ebonidatin-vv8o9viyp-ebonidatings-projects.vercel.app [5s]
-https://ebonidatin-vv8o9viyp-ebonidatings-projects.vercel.appQueued
+Uploading [--------------------] (0.0B/4.7KB)
+Uploading [====================] (4.7KB/4.7KB)
+Inspect: https://vercel.com/ebonidatings-projects/ebonidatin/AmSHqsqsjmMo6PfMun5Sx1k2ZuKe [6s]
+Production: https://ebonidatin-h7t5jgf4i-ebonidatings-projects.vercel.app [6s]
+https://ebonidatin-h7t5jgf4i-ebonidatings-projects.vercel.appQueued
 Building
-Completing

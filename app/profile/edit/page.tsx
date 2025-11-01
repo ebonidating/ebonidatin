@@ -2,6 +2,9 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import ProfileEditForm from "@/components/profile-edit-form"
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function ProfileEditPage() {
   const supabase = await createClient()
   const {

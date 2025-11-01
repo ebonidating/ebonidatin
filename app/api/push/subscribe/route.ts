@@ -1,4 +1,6 @@
 // app/api/push/subscribe/route.ts
+
+export const dynamic = 'force-dynamic'
 import { createRouteHandlerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"

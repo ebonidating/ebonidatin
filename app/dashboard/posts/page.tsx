@@ -7,6 +7,9 @@ import { Heart, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function PostsPage() {
   const supabase = await createClient()
   const {
