@@ -3,9 +3,10 @@ import Image from "next/image"
 import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ResponsiveNav } from "@/components/responsive-nav"
 
 const BannerHero = dynamic(() => import("@/components/banner-hero").then(mod => ({ default: mod.BannerHero })), {
-  loading: () => <div className="w-full h-96 md:h-[500px] rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 animate-pulse" />
+  loading: () => <div className="w-full h-64 md:h-96 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 animate-pulse" />
 })
 
 const ModelOfPeriod = dynamic(() => import("@/components/model-of-period").then(mod => ({ default: mod.ModelOfPeriod })), {
@@ -48,61 +49,40 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50" role="banner">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image 
-              src="/eboni-logo.png" 
-              alt="Eboni Dating" 
-              width={32} 
-              height={32}
-              priority
-            />
-            <span className="text-xl font-bold text-gray-900">Eboni Dating</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild>
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
-            <Button asChild className="bg-amber-600 hover:bg-amber-700">
-              <Link href="/auth/sign-up">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Responsive Header */}
+      <ResponsiveNav />
 
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="container mx-auto px-4 py-8">
+        <section className="container mx-auto px-4 py-6 md:py-8">
           <BannerHero
             image="/hero-banner.jpg"
             title="Find Love Within the Black Community"
-            subtitle="Join thousands of Black singles worldwide finding meaningful connections, love, and friendship in a culturally-rich, safe environment designed for our community."
+            subtitle="Join thousands of Black singles worldwide finding meaningful connections, love, and friendship."
             cta={{ text: "Get Started Free", href: "/auth/sign-up" }}
             priority
           />
         </section>
 
         {/* Top Models Section */}
-        <section className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Top Models</h2>
-          <p className="text-lg text-gray-600">Meet our most popular members</p>
+        <section className="container mx-auto px-4 py-8 md:py-16">
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 md:mb-4">Top Models</h2>
+          <p className="text-base md:text-lg text-gray-600">Meet our most popular members</p>
         </div>
         <ModelOfPeriod models={models} />
       </section>
 
       {/* About Us Section */}
-      <section className="container mx-auto px-4 py-16 font-medium text-sidebar-primary-foreground">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">About Us</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Eboni Dating is a premier platform built specifically for the Black diaspora community worldwide, connecting hearts across continents
+      <section className="container mx-auto px-4 py-8 md:py-16">
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 md:mb-4">About Us</h2>
+          <p className="text-sm md:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-4">
+            Eboni Dating is a premier platform built for the Black diaspora community worldwide
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
           <Card className="border-2 hover:border-amber-200 transition-colors hover:shadow-lg">
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
@@ -157,58 +137,39 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="container mx-auto px-4 py-16 bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl my-16">
-        <Card className="max-w-4xl mx-auto shadow-2xl border-0 bg-white">
-          <CardContent className="p-8 md:p-12">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
+      <section className="container mx-auto px-4 py-8 md:py-16">
+        <div className="bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl md:rounded-2xl p-1">
+          <Card className="max-w-4xl mx-auto border-0 bg-white">
+            <CardContent className="p-6 md:p-8 lg:p-12">
+              <div className="grid grid-cols-3 gap-4 md:gap-8 text-center">
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-amber-600 mb-2">50K+</div>
-                <div className="text-gray-600 font-medium">Active Members</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-amber-600 mb-1 md:mb-2">50K+</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-600 font-medium">Active Members</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-amber-600 mb-2">10K+</div>
-                <div className="text-gray-600 font-medium">Successful Matches</div>
+                <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-amber-600 mb-1 md:mb-2">10K+</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-600 font-medium">Successful Matches</div>
               </div>
               <div>
-                <div className="text-4xl md:text-5xl font-bold text-amber-600 mb-2 flex items-center justify-center gap-1">
+                <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-amber-600 mb-1 md:mb-2 flex items-center justify-center gap-0.5 md:gap-1">
                   4.8
-                  <svg className="h-8 w-8 fill-amber-600 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 fill-amber-600 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
-                <div className="text-gray-600 font-medium">User Rating</div>
+                <div className="text-xs sm:text-sm md:text-base text-gray-600 font-medium">User Rating</div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Advertise Section */}
-      <section className="container mx-auto px-4 py-16">
-        <Card className="max-w-4xl mx-auto bg-gradient-to-r from-amber-600 to-orange-600 border-0 text-white">
-          <CardContent className="p-8 md:p-12 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Advertise Your Business</h2>
-            <p className="text-lg mb-6 opacity-90">
-              Reach thousands of engaged users in the Black community. Promote your products, services, or brand.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary" className="bg-white text-amber-600 hover:bg-amber-50 min-h-[44px]">
-                <Link href="/advertise">Learn More</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
-                <Link href="/contact">Contact Sales</Link>
-              </Button>
             </div>
           </CardContent>
         </Card>
       </section>
 
         {/* Bottom CTA */}
-        <section className="container mx-auto px-4 py-16">
+        <section className="container mx-auto px-4 py-8 md:py-16">
           <BannerHero
             image="/couple-1.jpg"
             title="Ready to Find Your Match?"
-            subtitle="Join our community today and start connecting with amazing people who share your values and interests."
+            subtitle="Join our community today and start connecting with amazing people."
             cta={{ text: "Sign Up Now", href: "/auth/sign-up" }}
           />
         </section>
