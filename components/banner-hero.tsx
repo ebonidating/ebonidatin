@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 import { ChevronRight } from "lucide-react"
 
 interface BannerHeroProps {
@@ -13,17 +14,21 @@ interface BannerHeroProps {
     href: string
   }
   overlay?: boolean
+  priority?: boolean
 }
 
-export function BannerHero({ image, title, subtitle, cta, overlay = true }: BannerHeroProps) {
+export function BannerHero({ image, title, subtitle, cta, overlay = true, priority = false }: BannerHeroProps) {
   return (
     <div className="relative w-full h-96 md:h-[500px] overflow-hidden rounded-xl shadow-2xl group">
       {/* Background Image */}
-      <img
+      <Image
         src={image || "/placeholder.svg"}
         alt=""
-        role="presentation"
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        fill
+        priority={priority}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+        className="object-cover group-hover:scale-105 transition-transform duration-500"
+        quality={85}
       />
 
       {/* Overlay */}
