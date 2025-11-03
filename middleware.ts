@@ -11,13 +11,17 @@ export async function middleware(request: NextRequest) {
   const supabase = createServerClient(request, response)
   const { data: { session } } = await supabase.auth.getSession()
 
-  // Redirect to dashboard after login
-  if (session && request.nextUrl.pathname === '/auth/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Protect dashboard routes - require authentication
+  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Redirect to login if not authenticated
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+  // Protect explore, channels, profile routes
+  if (!session && (
+    request.nextUrl.pathname.startsWith('/explore') ||
+    request.nextUrl.pathname.startsWith('/channels') ||
+    request.nextUrl.pathname.startsWith('/profile')
+  )) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
