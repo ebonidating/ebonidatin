@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Heart } from "lucide-react"
+import Image from "next/image"
 import { EnhancedSignupForm } from "@/components/enhanced-signup-form"
 
 export default function SignUpPage() {
@@ -11,7 +11,7 @@ export default function SignUpPage() {
         <div className="flex flex-col gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center justify-center gap-2 mb-4">
-            <Heart className="h-8 w-8 text-cyan-600 fill-cyan-600" />
+            <Image src="/eboni-logo.png" alt="Eboni Dating" width={32} height={32} />
             <span className="text-2xl font-bold text-gray-900">Eboni Dating</span>
           </Link>
 
