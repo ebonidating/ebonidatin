@@ -159,9 +159,10 @@ export default function HomePage() {
                 </div>
                 <div className="text-xs sm:text-sm md:text-base text-gray-600 font-medium">User Rating</div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
         {/* Bottom CTA */}
