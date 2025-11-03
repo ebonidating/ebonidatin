@@ -1,11 +1,17 @@
 import Link from "next/link"
 import Image from "next/image"
-import { BannerHero } from "@/components/banner-hero"
-import { ModelOfPeriod } from "@/components/model-of-period"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Shield, Zap, MessageCircle, Users, Heart, Lock, Star } from "lucide-react"
+
+const BannerHero = dynamic(() => import("@/components/banner-hero").then(mod => ({ default: mod.BannerHero })), {
+  loading: () => <div className="w-full h-96 md:h-[500px] rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 animate-pulse" />
+})
+
+const ModelOfPeriod = dynamic(() => import("@/components/model-of-period").then(mod => ({ default: mod.ModelOfPeriod })), {
+  ssr: false,
+  loading: () => <div className="w-full h-96 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 animate-pulse" />
+})
 
 export const metadata = {
   title: "Home - Find Love in the Black Community",
@@ -71,10 +77,11 @@ export default function HomePage() {
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-8">
           <BannerHero
-            image="/model-1.jpg"
+            image="/hero-banner.jpg"
             title="Find Love Within the Black Community"
             subtitle="Join thousands of Black singles worldwide finding meaningful connections, love, and friendship in a culturally-rich, safe environment designed for our community."
             cta={{ text: "Get Started Free", href: "/auth/sign-up" }}
+            priority
           />
         </section>
 
@@ -99,7 +106,9 @@ export default function HomePage() {
           <Card className="border-2 hover:border-amber-200 transition-colors hover:shadow-lg">
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-amber-600" />
+                <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
               </div>
               <CardTitle>Verified Members</CardTitle>
             </CardHeader>
@@ -114,7 +123,9 @@ export default function HomePage() {
           <Card className="border-2 hover:border-amber-200 transition-colors hover:shadow-lg">
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                <Zap className="h-6 w-6 text-amber-600" />
+                <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                </svg>
               </div>
               <CardTitle>Smart Matching</CardTitle>
             </CardHeader>
@@ -129,7 +140,9 @@ export default function HomePage() {
           <Card className="border-2 hover:border-amber-200 transition-colors hover:shadow-lg">
             <CardHeader>
               <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
-                <MessageCircle className="h-6 w-6 text-amber-600" />
+                <svg className="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                </svg>
               </div>
               <CardTitle>Rich Communication</CardTitle>
             </CardHeader>
@@ -159,7 +172,9 @@ export default function HomePage() {
               <div>
                 <div className="text-4xl md:text-5xl font-bold text-amber-600 mb-2 flex items-center justify-center gap-1">
                   4.8
-                  <Star className="h-8 w-8 fill-amber-600 text-amber-600" />
+                  <svg className="h-8 w-8 fill-amber-600 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
                 </div>
                 <div className="text-gray-600 font-medium">User Rating</div>
               </div>
@@ -191,7 +206,7 @@ export default function HomePage() {
         {/* Bottom CTA */}
         <section className="container mx-auto px-4 py-16">
           <BannerHero
-            image="/model-2.jpg"
+            image="/couple-1.jpg"
             title="Ready to Find Your Match?"
             subtitle="Join our community today and start connecting with amazing people who share your values and interests."
             cta={{ text: "Sign Up Now", href: "/auth/sign-up" }}
