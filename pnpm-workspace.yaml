@@ -3,3 +3,4 @@ packages:
 
 ignoredBuiltDependencies:
   - '@sentry/cli'
+  - '@vercel/speed-insights'

@@ -15,7 +15,7 @@ export async function GET() {
 
   try {
     const startTime = Date.now();
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data, error } = await supabase.from('core.profiles').select('count').limit(1).single();
     
     const responseTime = Date.now() - startTime;
@@ -23,8 +23,8 @@ export async function GET() {
     checks.checks.database = {
       status: error ? 'unhealthy' : 'healthy',
       responseTime,
-      error: error?.message,
-    };
+      ...(error && { error: error.message }),
+    } as any;
 
     checks.status = error ? 'degraded' : 'healthy';
 
@@ -32,8 +32,8 @@ export async function GET() {
     checks.checks.database = {
       status: 'unhealthy',
       responseTime: 0,
-      error: error?.message || 'Unknown error',
-    };
+      ...(error && { error: error?.message || 'Unknown error' }),
+    } as any;
     checks.status = 'unhealthy';
   }
 

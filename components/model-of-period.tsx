@@ -80,7 +80,7 @@ export function ModelOfPeriod({ models }: ModelOfPeriodProps) {
     <div className="w-full max-w-6xl mx-auto">
       <div className="grid md:grid-cols-2 gap-4 md:gap-8">
         {/* Slideshow */}
-        <div className="relative aspect-[3/4] rounded-xl md:rounded-2xl overflow-hidden group shadow-lg">
+        <div className="relative aspect-[4/3] max-h-[400px] md:max-h-[500px] rounded-xl md:rounded-2xl overflow-hidden group shadow-lg">
           <Image
             src={currentImage}
             alt={currentModel.name}
@@ -88,7 +88,7 @@ export function ModelOfPeriod({ models }: ModelOfPeriodProps) {
             className="object-cover"
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
-            quality={70}
+            quality={60}
           />
           
           {/* Navigation Arrows */}
@@ -186,7 +186,7 @@ export function ModelOfPeriod({ models }: ModelOfPeriodProps) {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 33vw, 20vw"
-                  quality={70}
+                  quality={60}
                 />
                 {idx === currentIndex && (
                   <div className="absolute inset-0 bg-amber-600/20" />

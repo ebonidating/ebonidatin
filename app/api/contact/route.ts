@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, subject, message } = body;
 
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Log contact submission
     await supabase.from('admin.audit_log').insert({

@@ -71,7 +71,7 @@ export default async function AdminUsersPage() {
           <CardContent>
             <div className="space-y-4">
               {profiles && profiles.length > 0 ? (
-                profiles.map((profile) => (
+                profiles.map((profile: any) => (
                   <div
                     key={profile.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"

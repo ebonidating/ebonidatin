@@ -25,7 +25,7 @@ export async function GET() {
       .select("user_id, likes_count")
       .in(
         "user_id",
-        profiles.map((p) => p.id),
+        profiles.map((p: any) => p.id),
       )
 
     if (postsError) {
@@ -33,15 +33,15 @@ export async function GET() {
     }
 
     // Calculate total likes per model
-    const modelLikes = profiles.map((profile) => {
-      const totalLikes = posts
-        .filter((post) => post.user_id === profile.id)
-        .reduce((sum, post) => sum + (post.likes_count || 0), 0)
+    const modelLikes = profiles.map((profile: any) => {
+      const totalLikes = (posts || [])
+        .filter((post: any) => post.user_id === profile.id)
+        .reduce((sum: number, post: any) => sum + (post.likes_count || 0), 0)
 
       return {
         ...profile,
         total_likes: totalLikes,
-        posts_count: posts.filter((post) => post.user_id === profile.id).length,
+        posts_count: (posts || []).filter((post: any) => post.user_id === profile.id).length,
       }
     })
 

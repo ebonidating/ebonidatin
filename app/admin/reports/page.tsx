@@ -79,7 +79,7 @@ export default async function AdminReportsPage() {
           <CardContent>
             <div className="space-y-4">
               {reports && reports.length > 0 ? (
-                reports.map((report) => (
+                reports.map((report: any) => (
                   <div key={report.id} className="p-4 border rounded-lg hover:bg-gray-50">
                     <div className="flex items-start justify-between mb-2">
                       <div>
