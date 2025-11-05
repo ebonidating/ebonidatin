@@ -46,10 +46,14 @@ export function LoginForm() {
   const handleGoogleSignIn = async () => {
     va.track("login_attempt", { method: "google" });
     try {
+      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
+        : `${window.location.origin}/api/auth/callback`
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',

@@ -1,0 +1,221 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    PRODUCTION KEYS REQUIRED - MANUAL LIST                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+This is a simple checklist of all keys needed for production deployment.
+For detailed setup instructions, see PRODUCTION_KEYS_SETUP.md
+
+════════════════════════════════════════════════════════════════════════════════
+🔴 CRITICAL - MUST HAVE (App won't work without these)
+════════════════════════════════════════════════════════════════════════════════
+
+[ ] 1. NEXT_PUBLIC_APP_URL
+    Value: https://ebonidating.com
+    Where: Manual entry
+
+[ ] 2. NEXT_PUBLIC_URL
+    Value: https://ebonidating.com
+    Where: Manual entry
+
+[ ] 3. NODE_ENV
+    Value: production
+    Where: Manual entry
+
+[ ] 4. NEXT_PUBLIC_SUPABASE_URL
+    Where: Supabase Dashboard → Settings → API
+
+[ ] 5. NEXT_PUBLIC_SUPABASE_ANON_KEY
+    Where: Supabase Dashboard → Settings → API
+
+[ ] 6. SUPABASE_SERVICE_ROLE_KEY
+    Where: Supabase Dashboard → Settings → API
+
+[ ] 7. NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+    Where: Stripe Dashboard → Developers → API keys (LIVE MODE)
+
+[ ] 8. STRIPE_SECRET_KEY
+    Where: Stripe Dashboard → Developers → API keys (LIVE MODE)
+
+[ ] 9. STRIPE_WEBHOOK_SECRET
+    Where: Stripe Dashboard → Developers → Webhooks (after creating webhook)
+
+[ ] 10. NEXT_PUBLIC_STRIPE_PREMIUM_PRICE_ID
+    Where: Stripe Dashboard → Products → Premium tier → Price ID
+
+[ ] 11. NEXT_PUBLIC_STRIPE_ELITE_PRICE_ID
+    Where: Stripe Dashboard → Products → Elite tier → Price ID
+
+[ ] 12. RESEND_API_KEY
+    Where: Resend Dashboard → API Keys
+
+[ ] 13. RESEND_FROM_EMAIL
+    Value: noreply@ebonidating.com
+    Where: Manual entry (after domain verification)
+
+[ ] 14. BLOB_READ_WRITE_TOKEN
+    Where: Vercel Dashboard → Storage → Blob
+
+[ ] 15. SESSION_SECRET
+    Generate: openssl rand -base64 32
+    Where: Run command and copy output
+
+[ ] 16. ENCRYPTION_KEY
+    Generate: openssl rand -hex 32
+    Where: Run command and copy output
+
+[ ] 17. NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    Where: Cloudflare Dashboard → Turnstile
+
+[ ] 18. TURNSTILE_SECRET_KEY
+    Where: Cloudflare Dashboard → Turnstile
+
+════════════════════════════════════════════════════════════════════════════════
+🟠 HIGH PRIORITY - Recommended (Important features)
+════════════════════════════════════════════════════════════════════════════════
+
+[ ] 19. TWILIO_ACCOUNT_SID
+    Where: Twilio Console Dashboard
+
+[ ] 20. TWILIO_AUTH_TOKEN
+    Where: Twilio Console Dashboard
+
+[ ] 21. TWILIO_PHONE_NUMBER
+    Where: Twilio Console → Phone Numbers
+
+[ ] 22. UPSTASH_REDIS_REST_URL
+    Where: Upstash Console → Redis Database
+
+[ ] 23. UPSTASH_REDIS_REST_TOKEN
+    Where: Upstash Console → Redis Database
+
+[ ] 24. NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    Generate: npx web-push generate-vapid-keys
+    Where: Run command and copy public key
+
+[ ] 25. VAPID_PRIVATE_KEY
+    Generate: npx web-push generate-vapid-keys
+    Where: Run command and copy private key
+
+[ ] 26. VAPID_EMAIL
+    Value: mailto:admin@ebonidating.com
+    Where: Manual entry
+
+════════════════════════════════════════════════════════════════════════════════
+🟡 MEDIUM PRIORITY - Optional (Enhanced features)
+════════════════════════════════════════════════════════════════════════════════
+
+[ ] 27. CLOUDINARY_CLOUD_NAME
+    Where: Cloudinary Dashboard
+
+[ ] 28. CLOUDINARY_API_KEY
+    Where: Cloudinary Dashboard
+
+[ ] 29. CLOUDINARY_API_SECRET
+    Where: Cloudinary Dashboard
+
+[ ] 30. GOOGLE_MAPS_API_KEY
+    Where: Google Cloud Console → APIs & Services → Credentials
+
+[ ] 31. NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+    Where: Google Cloud Console → reCAPTCHA
+
+[ ] 32. RECAPTCHA_SECRET_KEY
+    Where: Google Cloud Console → reCAPTCHA
+
+[ ] 33. GOOGLE_CLOUD_PROJECT_ID
+    Where: Google Cloud Console → Project Settings
+
+[ ] 34. NEXT_PUBLIC_INTERCOM_APP_ID
+    Where: Intercom Dashboard
+
+════════════════════════════════════════════════════════════════════════════════
+📊 MONITORING - Optional (Error tracking & analytics)
+════════════════════════════════════════════════════════════════════════════════
+
+[ ] 35. NEXT_PUBLIC_SENTRY_DSN
+    Where: Sentry Dashboard → Project Settings
+
+[ ] 36. SENTRY_AUTH_TOKEN
+    Where: Sentry Dashboard → Settings → Auth Tokens
+
+[ ] 37. SENTRY_ORG
+    Where: Sentry Dashboard → Organization Settings
+
+[ ] 38. SENTRY_PROJECT
+    Where: Sentry Dashboard → Project Settings
+
+[ ] 39. NEXT_PUBLIC_GA_ID
+    Where: Google Analytics → Admin → Data Streams
+
+════════════════════════════════════════════════════════════════════════════════
+⚙️ ADDITIONAL CONFIGURATION REQUIRED (Not just keys)
+════════════════════════════════════════════════════════════════════════════════
+
+SUPABASE:
+[ ] Site URL set to: https://ebonidating.com
+[ ] Redirect URLs added:
+    [ ] https://ebonidating.com/auth/callback
+    [ ] https://ebonidating.com/api/auth/callback
+    [ ] https://www.ebonidating.com/auth/callback
+    [ ] https://www.ebonidating.com/api/auth/callback
+[ ] Email templates updated with production URL
+[ ] Google OAuth provider enabled
+
+GOOGLE CLOUD CONSOLE:
+[ ] OAuth 2.0 Client created
+[ ] Authorized redirect URI added: https://[project].supabase.co/auth/v1/callback
+[ ] Authorized JavaScript origins:
+    [ ] https://ebonidating.com
+    [ ] https://www.ebonidating.com
+[ ] Client ID and Secret copied to Supabase
+
+STRIPE:
+[ ] Switched to LIVE mode
+[ ] Webhook endpoint added: https://ebonidating.com/api/webhooks/stripe
+[ ] Webhook events selected:
+    [ ] checkout.session.completed
+    [ ] customer.subscription.created
+    [ ] customer.subscription.updated
+    [ ] customer.subscription.deleted
+    [ ] invoice.payment_succeeded
+    [ ] invoice.payment_failed
+
+RESEND:
+[ ] Domain added: ebonidating.com
+[ ] DNS records configured:
+    [ ] TXT record
+    [ ] MX record
+[ ] Domain verified
+
+VERCEL:
+[ ] Domain added: ebonidating.com
+[ ] Domain added: www.ebonidating.com
+[ ] DNS configured
+[ ] SSL certificate active
+[ ] All environment variables added to Production environment
+
+CLOUDFLARE:
+[ ] Turnstile widget created
+[ ] Domain added: ebonidating.com
+
+════════════════════════════════════════════════════════════════════════════════
+📝 NOTES
+════════════════════════════════════════════════════════════════════════════════
+
+- Use .env.production.template to copy-paste into Vercel
+- See PRODUCTION_KEYS_SETUP.md for detailed instructions
+- See DEPLOYMENT_CHECKLIST.md for step-by-step deployment
+- Test everything after deployment using checklist
+
+════════════════════════════════════════════════════════════════════════════════
+
+Total Keys Required:
+  - Critical: 18 keys
+  - High Priority: 8 keys
+  - Medium Priority: 8 keys
+  - Monitoring: 5 keys
+  - Total: 39 keys
+
+Minimum to Deploy: 18 critical keys + configuration
+
+════════════════════════════════════════════════════════════════════════════════

@@ -146,7 +146,9 @@ export function EnhancedSignupForm() {
       }
 
       const supabase = createClient()
-      const redirectUrl = `${window.location.origin}/auth/callback`
+      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`
 
       // Sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -217,10 +219,14 @@ export function EnhancedSignupForm() {
     
     try {
       const supabase = createClient()
+      const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
+        : `${window.location.origin}/api/auth/callback`
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/api/auth/callback`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
