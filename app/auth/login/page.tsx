@@ -10,15 +10,15 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import { useState, useRef, useEffect } from "react"
-import { useRecaptcha } from "@/hooks/use-recaptcha"
+import { TurnstileWidget } from "@/components/turnstile-widget"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const errorRef = useRef<HTMLDivElement>(null)
-  const { executeRecaptcha } = useRecaptcha()
 
   useEffect(() => {
     if (error && errorRef.current) {
@@ -33,22 +33,21 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      // Execute reCAPTCHA
-      const recaptchaToken = await executeRecaptcha("LOGIN")
-      
-      if (recaptchaToken) {
-        // Verify reCAPTCHA token
-        const verifyResponse = await fetch("/api/verify-recaptcha", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: recaptchaToken, action: "LOGIN" }),
-        })
+      // Verify Turnstile token
+      if (!turnstileToken) {
+        throw new Error("Please complete the security verification.")
+      }
 
-        const verifyData = await verifyResponse.json()
+      const verifyResponse = await fetch("/api/verify-turnstile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      })
 
-        if (!verifyData.success) {
-          throw new Error("Security verification failed. Please try again.")
-        }
+      const verifyData = await verifyResponse.json()
+
+      if (!verifyData.success) {
+        throw new Error("Security verification failed. Please try again.")
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -183,6 +182,15 @@ export default function LoginPage() {
                       disabled={isLoading}
                     />
                   </div>
+                  
+                  {/* Cloudflare Turnstile */}
+                  <div className="flex justify-center">
+                    <TurnstileWidget
+                      onSuccess={(token) => setTurnstileToken(token)}
+                      onError={() => setError("Security verification failed. Please refresh the page.")}
+                    />
+                  </div>
+                  
                   {error && (
                     <div ref={errorRef} tabIndex={-1}>
                       <Alert variant="destructive" aria-live="polite">
@@ -190,7 +198,7 @@ export default function LoginPage() {
                       </Alert>
                     </div>
                   )}
-                  <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700" disabled={isLoading || !turnstileToken}>
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </div>

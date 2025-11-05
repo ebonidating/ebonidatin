@@ -15,12 +15,12 @@ import { Loader2, Mail, Lock, User, Eye, EyeOff, Phone, MapPin, Calendar } from 
 import Link from "next/link"
 import { Country, City } from "country-state-city"
 import PhoneInput from "react-phone-number-input"
-import { useRecaptcha } from "@/hooks/use-recaptcha"
+import { TurnstileWidget } from "@/components/turnstile-widget"
 
 
 export function EnhancedSignupForm() {
   const router = useRouter()
-  const { executeRecaptcha } = useRecaptcha()
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -124,23 +124,25 @@ export function EnhancedSignupForm() {
 
     setLoading(true)
 
+    // Verify Turnstile token
+    if (!turnstileToken) {
+      setError("Please complete the security verification")
+      setLoading(false)
+      return
+    }
+
     try {
-      // Execute reCAPTCHA
-      const recaptchaToken = await executeRecaptcha("SIGNUP")
-      
-      if (recaptchaToken) {
-        // Verify reCAPTCHA token
-        const verifyResponse = await fetch("/api/verify-recaptcha", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: recaptchaToken, action: "SIGNUP" }),
-        })
+      // Verify Turnstile token
+      const verifyResponse = await fetch("/api/verify-turnstile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      })
 
-        const verifyData = await verifyResponse.json()
+      const verifyData = await verifyResponse.json()
 
-        if (!verifyData.success) {
-          throw new Error("Security verification failed. Please try again.")
-        }
+      if (!verifyData.success) {
+        throw new Error("Security verification failed. Please try again.")
       }
 
       const supabase = createClient()
@@ -485,8 +487,16 @@ export function EnhancedSignupForm() {
             </Alert>
           )}
 
+          {/* Cloudflare Turnstile */}
+          <div className="flex justify-center my-4">
+            <TurnstileWidget
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setError("Security verification failed. Please refresh the page.")}
+            />
+          </div>
+
           {/* Submit Button */}
-          <Button type="submit" className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700" disabled={loading}>
+          <Button type="submit" className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700" disabled={loading || !turnstileToken}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
