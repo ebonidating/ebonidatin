@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import Link from "next/link"
+import { AdminUsersTable } from "@/components/admin-users-table"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, ArrowLeft } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 async function checkAdminAccess() {
   const supabase = await createClient()
@@ -16,10 +16,14 @@ async function checkAdminAccess() {
     redirect("/admin/login")
   }
 
-  const { data: adminUser } = await supabase.from("admin_users").select("*").eq("user_id", user.id).single()
+  const { data: adminUser } = await supabase
+    .from("admin_users")
+    .select("*")
+    .eq("user_id", user.id)
+    .single()
 
-  if (!adminUser) {
-    redirect("/")
+  if (!adminUser || !adminUser.is_active || !adminUser.permissions?.manage_users) {
+    redirect("/admin")
   }
 
   return { user, adminUser }
@@ -28,77 +32,88 @@ async function checkAdminAccess() {
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; search?: string; filter?: string }
+}) {
   await checkAdminAccess()
-
   const supabase = await createClient()
 
-  // Fetch all users with their profiles
-  const { data: profiles } = await supabase
+  const page = parseInt(searchParams.page || "1")
+  const search = searchParams.search || ""
+  const filter = searchParams.filter || "all"
+  const perPage = 20
+
+  // Build query
+  let query = supabase
     .from("profiles")
-    .select("*")
+    .select("*", { count: "exact" })
+
+  // Apply search
+  if (search) {
+    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
+  }
+
+  // Apply filters
+  if (filter === "verified") {
+    query = query.eq("verified", true)
+  } else if (filter === "unverified") {
+    query = query.eq("verified", false)
+  } else if (filter === "premium") {
+    query = query.in("subscription_tier", ["premium", "elite"])
+  } else if (filter === "recent") {
+    query = query.gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+  }
+
+  // Fetch users with pagination
+  const { data: users, count } = await query
     .order("created_at", { ascending: false })
-    .limit(50)
+    .range((page - 1) * perPage, page * perPage - 1)
+
+  const totalPages = Math.ceil((count || 0) / perPage)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/admin">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-cyan-600" />
-              <span className="text-xl font-bold">User Management</span>
+      {/* Header */}
+      <header className="bg-white border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/admin">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
+                <p className="text-sm text-gray-600">Manage all user accounts</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">All Users</h1>
-          <p className="text-gray-600">Total: {profiles?.length || 0} users</p>
-        </div>
-
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle>User List</CardTitle>
+            <CardTitle>All Users ({count || 0})</CardTitle>
+            <CardDescription>
+              View, search, and manage user accounts
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {profiles && profiles.length > 0 ? (
-                profiles.map((profile: any) => (
-                  <div
-                    key={profile.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium text-gray-900">{profile.full_name || "No name"}</div>
-                      <div className="text-sm text-gray-500">
-                        {profile.age} years old • {profile.location || "No location"}
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        Joined: {new Date(profile.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={profile.bio ? "default" : "secondary"}>
-                        {profile.bio ? "Complete" : "Incomplete"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">No users found</div>
-              )}
-            </div>
+            <AdminUsersTable
+              users={users || []}
+              currentPage={page}
+              totalPages={totalPages}
+              totalUsers={count || 0}
+            />
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   )
 }

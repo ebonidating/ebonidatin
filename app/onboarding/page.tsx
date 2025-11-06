@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import OnboardingForm from "@/components/onboarding-form"
+import SinglePageOnboarding from "@/components/single-page-onboarding"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -15,19 +15,13 @@ export default async function OnboardingPage() {
     redirect("/auth/login")
   }
 
-  // Check if profile already exists
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  // Check if profile is already complete
+  const { data: profile } = await supabase.from("profiles").select("profile_completion").eq("id", user.id).single()
 
-  // If profile exists, redirect to dashboard
-  if (profile) {
+  // If profile is complete (>= 70%), redirect to dashboard
+  if (profile && profile.profile_completion >= 70) {
     redirect("/dashboard")
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white">
-      <div className="container mx-auto px-4 py-8">
-        <OnboardingForm userId={user.id} userEmail={user.email!} />
-      </div>
-    </div>
-  )
+  return <SinglePageOnboarding userId={user.id} userEmail={user.email!} />
 }

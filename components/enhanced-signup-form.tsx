@@ -171,14 +171,8 @@ export function EnhancedSignupForm() {
 
       if (authData.user) {
         // Note: Profile is created automatically by database trigger (handle_new_user)
-        // Just redirect to dashboard - email verification will be handled there if needed
-        if (authData.session) {
-          // User is logged in, redirect to dashboard
-          router.push("/dashboard")
-        } else {
-          // Email confirmation required
-          setSuccess(true)
-        }
+        // Email confirmation required for email signups
+        setSuccess(true)
       }
     } catch (err: any) {
       console.error("Signup error:", err)
@@ -202,8 +196,8 @@ export function EnhancedSignupForm() {
     try {
       const supabase = createClient()
       const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
-        ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
-        : `${window.location.origin}/auth/callback`
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/onboarding`
+        : `${window.location.origin}/onboarding`
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
