@@ -170,29 +170,11 @@ export function EnhancedSignupForm() {
       if (authError) throw authError
 
       if (authData.user) {
-        // Create profile
-        const { error: profileError } = await supabase.from("profiles").insert({
-          id: authData.user.id,
-          email: authData.user.email,
-          full_name: formData.fullName,
-          date_of_birth: formData.dateOfBirth,
-          gender: formData.gender,
-          phone: formData.phone,
-          country: formData.country,
-          city: formData.city,
-          subscription_tier: "free",
-          email_verified: false,
-          created_at: new Date().toISOString(),
-        })
-
-        if (profileError && !profileError.message.includes("duplicate")) {
-          console.error("Profile creation error:", profileError)
-        }
-
-        // Check if email confirmation is required
+        // Note: Profile is created automatically by database trigger (handle_new_user)
+        // Just redirect to dashboard - email verification will be handled there if needed
         if (authData.session) {
-          // Auto-logged in, redirect to onboarding
-          router.push("/onboarding")
+          // User is logged in, redirect to dashboard
+          router.push("/dashboard")
         } else {
           // Email confirmation required
           setSuccess(true)
@@ -220,8 +202,8 @@ export function EnhancedSignupForm() {
     try {
       const supabase = createClient()
       const redirectUrl = process.env.NEXT_PUBLIC_APP_URL 
-        ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`
-        : `${window.location.origin}/api/auth/callback`
+        ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -230,7 +212,8 @@ export function EnhancedSignupForm() {
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
-          }
+          },
+          skipBrowserRedirect: false,
         },
       })
       

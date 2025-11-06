@@ -31,7 +31,8 @@ export async function GET(request: Request) {
         const userMetadata = sessionData.user.user_metadata
         const isOAuthProvider = userMetadata.provider === 'google' || userMetadata.provider === 'facebook'
 
-        // Profile doesn't exist - create it
+        // Profile doesn't exist - create it (for OAuth users)
+        // Note: Email signup users get profile created by handle_new_user trigger
         if (profileError && profileError.code === "PGRST116") {
           const authProvider = isOAuthProvider ? userMetadata.provider : 'email'
           const displayName = userMetadata.full_name || userMetadata.name || sessionData.user.email?.split('@')[0] || ''
@@ -45,32 +46,21 @@ export async function GET(request: Request) {
             auth_provider: authProvider,
             oauth_provider_id: userMetadata.sub || null,
             subscription_tier: "free",
-            email_verified: true,
+            email_verified: true, // OAuth users are auto-verified
             last_login_at: new Date().toISOString(),
             login_count: 1,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
 
-          // Check onboarding status
-          const { data: onboardingData } = await supabase
-            .from("onboarding_progress")
-            .select("*")
-            .eq("user_id", sessionData.user.id)
-            .single()
-
-          // Redirect based on onboarding completion
-          if (!onboardingData || !onboardingData.onboarding_completed_at) {
-            return NextResponse.redirect(`${baseUrl}/onboarding?step=1&source=oauth`)
-          }
-          
+          // Google OAuth users go directly to dashboard (no onboarding required)
           return NextResponse.redirect(`${baseUrl}/dashboard?welcome=true`)
         }
 
         // Profile exists - update it
         if (profile) {
           const updateData: any = {
-            email_verified: true,
+            email_verified: true, // Mark as verified on login
             last_login_at: new Date().toISOString(),
             login_count: (profile.login_count || 0) + 1,
             updated_at: new Date().toISOString(),
@@ -86,19 +76,7 @@ export async function GET(request: Request) {
             .update(updateData)
             .eq("id", sessionData.user.id)
 
-          // Check if needs onboarding
-          if (!profile.onboarding_completed) {
-            const { data: onboardingData } = await supabase
-              .from("onboarding_progress")
-              .select("current_step")
-              .eq("user_id", sessionData.user.id)
-              .single()
-
-            const currentStep = onboardingData?.current_step || 1
-            return NextResponse.redirect(`${baseUrl}/onboarding?step=${currentStep}&source=callback`)
-          }
-
-          // User is verified and onboarded - go to dashboard
+          // All users go directly to dashboard
           return NextResponse.redirect(`${baseUrl}/dashboard`)
         }
 
