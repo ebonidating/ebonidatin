@@ -1,5 +1,26 @@
 name = "ebonidating"
 compatibility_date = "2025-11-07"
+pages_build_output_dir = ".vercel/output/static"
 
-# For Cloudflare Pages (Next.js output)
-pages_build_output_dir = ".next"
+# R2 Storage for uploads (images, videos, files)
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "ebonidating-uploads"
+preview_bucket_name = "ebonidating-uploads-preview"
+
+# KV for caching and sessions
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_KV_PREVIEW_ID"
+
+# D1 Database (optional - you're using Supabase)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "ebonidating_db"
+# database_id = "YOUR_D1_DATABASE_ID"
+
+# Environment variables (set via CLI or dashboard)
+# DO NOT commit secrets here - use: wrangler secret put SECRET_NAME
+# [vars]
+# NEXT_PUBLIC_APP_URL = "https://ebonidating.com"
