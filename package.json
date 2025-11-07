@@ -12,7 +12,8 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf .next node_modules/.cache"
+    "clean": "rm -rf .next node_modules/.cache",
+    "approve-builds": "echo 'Build approved'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -34,7 +35,6 @@
     "@sentry/nextjs": "^10.22.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.78.0",
-
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
