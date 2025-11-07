@@ -10,7 +10,6 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .next node_modules/.cache",
-    "postinstall": "pnpm approve-builds"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
