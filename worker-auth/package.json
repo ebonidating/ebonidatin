@@ -1,0 +1,17 @@
+{
+  "name": "ebonidating-auth-worker",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "echo 'no build needed for worker' ",
+    "deploy": "wrangler deploy --env production"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jose": "^4.16.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.46.0"
+  }
+}

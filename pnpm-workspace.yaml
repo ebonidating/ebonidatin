@@ -4,3 +4,8 @@ packages:
 ignoredBuiltDependencies:
   - '@sentry/cli'
   - '@vercel/speed-insights'
+  - sharp
+  - workerd
+
+onlyBuiltDependencies:
+  - esbuild

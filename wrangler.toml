@@ -1,0 +1,5 @@
+name = "ebonidating"
+compatibility_date = "2025-11-07"
+
+# For Cloudflare Pages (Next.js output)
+pages_build_output_dir = ".next"

@@ -1,33 +1,37 @@
-// app/api/push/subscribe/route.ts
+export const dynamic = "force-dynamic"
 
-export const dynamic = 'force-dynamic'
-import { createRouteHandlerClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { createServerClient } from "@supabase/ssr"
+import { NextResponse } from "next/server"
 
-export async function POST(req: NextRequest) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+export async function POST(req: Request) {
+  try {
+    const cookieStore = cookies()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    const { subscription } = await req.json()
+
+    // Store the subscription in Supabase
+    const { error } = await supabase.from("subscriptions").insert({ subscription })
+    if (error) throw error
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Subscription error:", error)
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 })
   }
-
-  const subscription = await req.json()
-
-  if (!subscription) {
-    return NextResponse.json({ error: "Missing subscription object" }, { status: 400 })
-  }
-
-  const { data, error } = await supabase.from("push_subscriptions").insert([{ user_id: user.id, subscription }])
-
-  if (error) {
-    return NextResponse.json({ error: "Failed to save subscription" }, { status: 500 })
-  }
-
-  return NextResponse.json({ message: "Subscription saved" }, { status: 201 })
 }

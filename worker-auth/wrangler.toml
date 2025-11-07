@@ -1,0 +1,15 @@
+name = "ebonidating-auth"
+compatibility_date = "2025-11-07"
+
+# D1 binding (replace database_name/database_id after creating D1)
+[[d1_databases]]
+binding = "DB"
+database_name = "ebonidating_db"
+database_id = "<YOUR_D1_DATABASE_ID>"
+
+# You can set environment variables per-environment here OR use wrangler secrets/env
+# For production you should set via: `wrangler secret put JWT_SECRET` and `wrangler secret put JWT_EXP`
+# This is just an example for local/dev:
+[env.production]
+# Example: set secrets via CLI instead of putting them here
+# jwt_secret = "replace-me"
