@@ -2,9 +2,53 @@ import { createServerClient as createSupabaseServerClient, type CookieOptions } 
 import { type NextRequest, NextResponse } from 'next/server'
 
 export function createServerClient(request: NextRequest, response: NextResponse) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  // Return a no-op client if environment variables are missing
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables')
+    // Return a mock client that won't throw errors
+    return createSupabaseServerClient(
+      supabaseUrl || 'https://placeholder.supabase.co',
+      supabaseKey || 'placeholder-key',
+      {
+        cookies: {
+          get(name: string) {
+            return request.cookies.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            request.cookies.set({
+              name,
+              value,
+              ...options,
+            })
+            response.cookies.set({
+              name,
+              value,
+              ...options,
+            })
+          },
+          remove(name: string, options: CookieOptions) {
+            request.cookies.set({
+              name,
+              value: '',
+              ...options,
+            })
+            response.cookies.set({
+              name,
+              value: '',
+              ...options,
+            })
+          },
+        },
+      }
+    )
+  }
+
   return createSupabaseServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         get(name: string) {

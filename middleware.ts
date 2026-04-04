@@ -8,17 +8,22 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  const supabase = createServerClient(request, response)
-  const { data: { session } } = await supabase.auth.getSession()
+  try {
+    const supabase = createServerClient(request, response)
+    const { data: { session } } = await supabase.auth.getSession()
 
-  // Redirect to dashboard after login
-  if (session && request.nextUrl.pathname === '/auth/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+    // Redirect to dashboard after login
+    if (session && request.nextUrl.pathname === '/auth/login') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
 
-  // Redirect to login if not authenticated
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+    // Redirect to login if not authenticated
+    if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/auth/login', request.url))
+    }
+  } catch (error) {
+    console.error('[Middleware] Error checking session:', error)
+    // Continue without redirecting if there's an error
   }
 
   return response

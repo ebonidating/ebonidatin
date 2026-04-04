@@ -2,8 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
-import { Analytics } from "@vercel/analytics/next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { ThemeProvider } from "@/lib/theme/theme-provider"
@@ -128,8 +126,6 @@ export default function RootLayout({
             </Suspense>
           </ErrorBoundary>
         </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
         
         {/* reCAPTCHA Enterprise */}
         <Script
