@@ -7,7 +7,6 @@ export function createServerClient(request: NextRequest, response: NextResponse)
 
   // Return a no-op client if environment variables are missing
   if (!supabaseUrl || !supabaseKey) {
-    console.warn('[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables')
     // Return a mock client that won't throw errors
     return createSupabaseServerClient(
       supabaseUrl || 'https://placeholder.supabase.co',
