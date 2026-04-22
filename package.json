@@ -55,6 +55,7 @@
     "react-phone-number-input": "^3.4.11",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.4",
+    "resend": "^6.12.2",
     "sonner": "latest",
     "stripe": "latest",
     "tailwind-merge": "^2.5.5",

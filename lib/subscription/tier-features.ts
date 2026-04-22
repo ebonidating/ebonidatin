@@ -1,15 +1,20 @@
-export type SubscriptionTier = "free" | "premium" | "vip" | "model_pro"
+export type SubscriptionTier = "free" | "premium" | "vip" | "model_pro" | "corporate" | "family"
 
 export interface TierFeatures {
   name: string
   price: number
+  monthlyPrice?: number
+  annualPrice?: number
   features: Record<string, boolean>
+  maxUsers?: number
 }
 
 export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
   free: {
     name: "Free",
     price: 0,
+    monthlyPrice: 0,
+    annualPrice: 0,
     features: {
       createProfile: true,
       browseProfiles: true,
@@ -32,11 +37,15 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
       premiumContent: false,
       virtualGifts: false,
       prioritySupport: false,
+      familySharing: false,
+      corporateAdmin: false,
     },
   },
   premium: {
     name: "Premium",
     price: 9.99,
+    monthlyPrice: 9.99,
+    annualPrice: 99.99,
     features: {
       createProfile: true,
       browseProfiles: true,
@@ -59,11 +68,15 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
       premiumContent: false,
       virtualGifts: true,
       prioritySupport: false,
+      familySharing: false,
+      corporateAdmin: false,
     },
   },
   vip: {
     name: "VIP",
     price: 19.99,
+    monthlyPrice: 19.99,
+    annualPrice: 199.99,
     features: {
       createProfile: true,
       browseProfiles: true,
@@ -86,11 +99,15 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
       premiumContent: true,
       virtualGifts: true,
       prioritySupport: true,
+      familySharing: false,
+      corporateAdmin: false,
     },
   },
   model_pro: {
     name: "Model Pro",
     price: 29.99,
+    monthlyPrice: 29.99,
+    annualPrice: 299.99,
     features: {
       createProfile: true,
       browseProfiles: true,
@@ -113,6 +130,72 @@ export const TIER_FEATURES: Record<SubscriptionTier, TierFeatures> = {
       premiumContent: true,
       virtualGifts: true,
       prioritySupport: true,
+      familySharing: false,
+      corporateAdmin: false,
+    },
+  },
+  family: {
+    name: "Family",
+    price: 24.99,
+    monthlyPrice: 24.99,
+    annualPrice: 249.99,
+    maxUsers: 5,
+    features: {
+      createProfile: true,
+      browseProfiles: true,
+      likeProfiles: true,
+      seeMatches: true,
+      sendMessages: true,
+      unlimitedMessaging: true,
+      seeWhoLikedYou: true,
+      videoCalls: true,
+      advancedFilters: true,
+      superLikes: true,
+      rewind: true,
+      incognitoMode: true,
+      passport: true,
+      profileBoost: true,
+      verifiedBadge: true,
+      portfolioShowcase: false,
+      bookingSystem: false,
+      modelVerification: false,
+      premiumContent: true,
+      virtualGifts: true,
+      prioritySupport: true,
+      familySharing: true,
+      corporateAdmin: false,
+    },
+  },
+  corporate: {
+    name: "Corporate",
+    price: 99.99,
+    monthlyPrice: 99.99,
+    annualPrice: 999.99,
+    maxUsers: 100,
+    features: {
+      createProfile: true,
+      browseProfiles: true,
+      likeProfiles: true,
+      seeMatches: true,
+      sendMessages: true,
+      unlimitedMessaging: true,
+      seeWhoLikedYou: true,
+      videoCalls: true,
+      advancedFilters: true,
+      superLikes: true,
+      rewind: true,
+      incognitoMode: true,
+      passport: true,
+      profileBoost: true,
+      verifiedBadge: true,
+      portfolioShowcase: true,
+      bookingSystem: true,
+      modelVerification: true,
+      premiumContent: true,
+      virtualGifts: true,
+      prioritySupport: true,
+      familySharing: true,
+      corporateAdmin: true,
     },
   },
 }
